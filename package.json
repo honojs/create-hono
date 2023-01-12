@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsx ./build.ts",
+    "prerelease": "yarn build",
     "release": "np"
   },
   "bin": "./bin",
@@ -16,6 +17,9 @@
     "url": "https://github.com/honojs/create-hono.git"
   },
   "homepage": "https://honojs.dev",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "devDependencies": {
     "esbuild": "^0.16.17",
     "tsx": "^3.12.2"
