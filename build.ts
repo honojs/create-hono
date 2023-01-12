@@ -7,6 +7,7 @@ const b = () =>
     banner: {
       js: '#!/usr/bin/env node',
     },
+    platform: 'node',
     outfile: 'bin',
     format: 'cjs',
   })
