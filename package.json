@@ -1,0 +1,23 @@
+{
+  "name": "create-hono",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "tsx ./build.ts",
+    "release": "np"
+  },
+  "bin": "./bin",
+  "files": [
+    "bin"
+  ],
+  "author": "Yusuke Wada <https://github.com/yusukebe>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/honojs/create-hono.git"
+  },
+  "homepage": "https://honojs.dev",
+  "devDependencies": {
+    "esbuild": "^0.16.17",
+    "tsx": "^3.12.2"
+  }
+}
