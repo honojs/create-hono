@@ -6,6 +6,16 @@ Create a Hono application from starter templates.
 npm create hono@latest
 ```
 
+## Options
+
+### `--template`
+
+You can specify the desired template from the command line. This is useful for automation, where you'd like to skip any interactive prompts.
+
+```
+npm create hono ./my-hono-app --template cloudflare-pages
+```
+
 ## Author
 
 Yusuke Wada <https://github.com/yusukebe>
