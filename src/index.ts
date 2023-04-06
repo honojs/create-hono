@@ -29,7 +29,8 @@ async function main() {
 
   let args = yargsParser(process.argv.slice(2))
 
-  const target = process.argv[2] || '.'
+  const target = String(args._[0]) || '.'
+  const templateArg = args.template
 
   const templateDirs = await viaContentsApi(config)
   const templates = {}
@@ -42,23 +43,29 @@ async function main() {
       }
     }
   })
-  let templateNames = [...Object.values(templates)]
+  let templateNames = [...Object.values(templates)] as { name: string }[]
 
-  const templateName = (
-    await prompts({
-      type: 'select',
-      name: 'template',
-      message: 'Which template do you want to use?',
-      choices: templateNames.map((template: any) => ({
-        title: template.name,
-        value: template.name,
-      })),
-      initial: 0,
-    })
-  ).template
+  const templateName =
+    templateArg ||
+    (
+      await prompts({
+        type: 'select',
+        name: 'template',
+        message: 'Which template do you want to use?',
+        choices: templateNames.map((template: any) => ({
+          title: template.name,
+          value: template.name,
+        })),
+        initial: 0,
+      })
+    ).template
 
   if (!templateName) {
     throw new Error('No template selected')
+  }
+
+  if (!templateNames.find((t) => t.name === templateName)) {
+    throw new Error(`Invalid template selected: ${templateName}`)
   }
 
   if (fs.existsSync(target)) {
