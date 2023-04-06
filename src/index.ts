@@ -30,7 +30,7 @@ async function main() {
   let args = yargsParser(process.argv.slice(2))
 
   const target = String(args._[0]) || '.'
-  const templateArg = args._[1] && String(args._[1])
+  const templateArg = args.template
 
   const templateDirs = await viaContentsApi(config)
   const templates = {}
