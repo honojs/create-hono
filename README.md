@@ -13,7 +13,7 @@ npm create hono@latest
 You can specify the desired template from the command line. This is useful for automation, where you'd like to skip any interactive prompts.
 
 ```
-npm create hono ./my-hono-app --template cloudflare-pages
+npm create hono@latest ./my-app -- --template cloudflare-pages
 ```
 
 ## Author
