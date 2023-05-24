@@ -3,6 +3,7 @@
   "version": "0.2.5",
   "scripts": {
     "build": "tsx ./build.ts",
+    "prepack": "yarn build",
     "release": "np"
   },
   "bin": "./bin",
