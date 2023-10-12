@@ -45,16 +45,19 @@ async function main() {
   })
   let templateNames = [...Object.values(templates)] as { name: string }[]
 
-  const target =
-    (args._[0] && String(args._[0])) ||
-    ((
-      await prompts({
-        type: 'text',
-        name: 'target',
-        message: 'Target directory',
-        initial: 'my-app',
-      })
-    ).target as string)
+  let target = ''
+  if (args._[0]) {
+    target = String(args._[0])
+    console.log(`${bold(`${green(`✔`)} Using target directory`)} … ${target}`)
+  } else {
+    const ans = await prompts({
+      type: 'text',
+      name: 'target',
+      message: 'Target directory',
+      initial: 'my-app',
+    })
+    target = ans.target
+  }
 
   const templateName =
     templateArg ||
