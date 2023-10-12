@@ -46,8 +46,10 @@ async function main() {
   let templateNames = [...Object.values(templates)] as { name: string }[]
 
   let target = ''
+  let projectName = ''
   if (args._[0]) {
     target = String(args._[0])
+    projectName = target
     console.log(`${bold(`${green(`✔`)} Using target directory`)} … ${target}`)
   } else {
     const ans = await prompts({
@@ -57,6 +59,11 @@ async function main() {
       initial: 'my-app',
     })
     target = ans.target
+    if (ans.target === '.') {
+      projectName = path.basename(process.cwd())
+    } else {
+      projectName = path.basename(ans.target)
+    }
   }
 
   const templateName =
@@ -120,7 +127,7 @@ async function main() {
     const hooks = ON_CREATE_HOOKS.get(templateName) || []
     hooks.forEach((hook) => {
       hook({
-        projectName: target,
+        projectName,
         directoryPath: path.join(process.cwd(), target),
       })
     })
