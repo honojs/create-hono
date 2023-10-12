@@ -12,12 +12,12 @@ export const addOnCreateHook = (templateName: string, hook: Hook) => {
   ON_CREATE_HOOKS.set(templateName, hooks)
 }
 
-const REPLACE_PROJECT_NAME_KEY = '[DYNAMIC_PROJECT_NAME]'
+const PROJECT_NAME_REPLACE_KEY = '[DYNAMIC_PROJECT_NAME]'
 
 const rewriteWranglerHook: Hook = ({ projectName, directoryPath }) => {
   const wranglerPath = path.join(directoryPath, 'wrangler.toml')
   const wrangler = readFileSync(wranglerPath, 'utf-8')
-  const rewritten = wrangler.replace(REPLACE_PROJECT_NAME_KEY, projectName)
+  const rewritten = wrangler.replace(PROJECT_NAME_REPLACE_KEY, projectName)
   writeFileSync(wranglerPath, rewritten)
 }
 
