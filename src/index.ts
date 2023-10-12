@@ -6,6 +6,7 @@ import prompts from 'prompts'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
+import { ON_CREATE_HOOKS } from './hooks'
 
 const directoryName = 'templates'
 const config = {
@@ -111,6 +112,18 @@ async function main() {
       res({})
     })
   })
+
+  try {
+    const hooks = ON_CREATE_HOOKS.get(templateName) || []
+    hooks.forEach((hook) => {
+      hook({
+        projectName: target,
+        directoryPath: path.join(process.cwd(), target),
+      })
+    })
+  } catch (e) {
+    throw new Error(`Error running hook for ${templateName}: ${e.message}`)
+  }
 
   console.log(bold(green('✔ Copied project files')))
 }
