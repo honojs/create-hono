@@ -29,7 +29,6 @@ async function main() {
 
   let args = yargsParser(process.argv.slice(2))
 
-  const target = (args._[0] && String(args._[0])) || '.'
   const templateArg = args.template
 
   const templateDirs = await viaContentsApi(config)
@@ -44,6 +43,17 @@ async function main() {
     }
   })
   let templateNames = [...Object.values(templates)] as { name: string }[]
+
+  const target =
+    (args._[0] && String(args._[0])) ||
+    ((
+      await prompts({
+        type: 'text',
+        name: 'target',
+        message: 'Target directory',
+        initial: 'my-app',
+      })
+    ).target as string)
 
   const templateName =
     templateArg ||
