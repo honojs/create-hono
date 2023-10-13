@@ -48,21 +48,21 @@ async function main() {
   let target = ''
   let projectName = ''
   if (args._[0]) {
-    target = String(args._[0])
+    target = args._[0].toString()
     projectName = target
     console.log(`${bold(`${green(`✔`)} Using target directory`)} … ${target}`)
   } else {
-    const ans = await prompts({
+    const answer = await prompts({
       type: 'text',
       name: 'target',
       message: 'Target directory',
       initial: 'my-app',
     })
-    target = ans.target
-    if (ans.target === '.') {
+    target = answer.target
+    if (answer.target === '.') {
       projectName = path.basename(process.cwd())
     } else {
-      projectName = path.basename(ans.target)
+      projectName = path.basename(answer.target)
     }
   }
 
