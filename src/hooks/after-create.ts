@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { Hook } from './types'
 
-// <templateName, Hook[]>
+// <templateName, Hook[]>src/hooks/on-create.ts
 export const AFTER_CREATE = new Map<string, Hook[]>()
 
 export const addOnCreateHook = (templateName: string, hook: Hook) => {

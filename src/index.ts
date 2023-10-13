@@ -6,7 +6,7 @@ import prompts from 'prompts'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
-import { AFTER_CREATE } from './hooks/on-create'
+import { AFTER_CREATE } from './hooks/after-create'
 
 const directoryName = 'templates'
 const config = {
