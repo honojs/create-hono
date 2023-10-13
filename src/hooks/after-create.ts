@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs'
-import path from 'path'
+import * as path from 'path'
 import { Hook } from './types'
 
 // <templateName, Hook[]>
@@ -13,7 +13,7 @@ export const addAfterCreateHook = (templateName: string, hook: Hook) => {
 
 const PROJECT_NAME_REPLACE_KEY = '%%PROJECT_NAME%%'
 
-const rewriteWranglerHook: Hook = ({ projectName, directoryPath }) => {
+export const rewriteWranglerHook: Hook = ({ projectName, directoryPath }) => {
   const wranglerPath = path.join(directoryPath, 'wrangler.toml')
   const wrangler = readFileSync(wranglerPath, 'utf-8')
   const rewritten = wrangler.replace(PROJECT_NAME_REPLACE_KEY, projectName)
