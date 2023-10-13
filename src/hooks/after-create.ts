@@ -11,7 +11,7 @@ export const addOnCreateHook = (templateName: string, hook: Hook) => {
   AFTER_CREATE.set(templateName, hooks)
 }
 
-const PROJECT_NAME_REPLACE_KEY = '[DYNAMIC_PROJECT_NAME]'
+const PROJECT_NAME_REPLACE_KEY = '%%PROJECT_NAME%%'
 
 const rewriteWranglerHook: Hook = ({ projectName, directoryPath }) => {
   const wranglerPath = path.join(directoryPath, 'wrangler.toml')
