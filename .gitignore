@@ -3,3 +3,4 @@ node_modules
 bin
 package-lock.json
 yarn-error.log
+pnpm-lock.yaml
