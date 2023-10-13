@@ -2,10 +2,10 @@ import { readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { Hook } from './types'
 
-// <templateName, Hook[]>src/hooks/on-create.ts
+// <templateName, Hook[]>
 export const AFTER_CREATE = new Map<string, Hook[]>()
 
-export const addOnCreateHook = (templateName: string, hook: Hook) => {
+export const addAfterCreateHook = (templateName: string, hook: Hook) => {
   const hooks = AFTER_CREATE.get(templateName) || []
   hooks.push(hook)
   AFTER_CREATE.set(templateName, hooks)
@@ -20,4 +20,4 @@ const rewriteWranglerHook: Hook = ({ projectName, directoryPath }) => {
   writeFileSync(wranglerPath, rewritten)
 }
 
-addOnCreateHook('cloudflare-workers', rewriteWranglerHook)
+addAfterCreateHook('cloudflare-workers', rewriteWranglerHook)
