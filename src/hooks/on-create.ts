@@ -3,12 +3,12 @@ import path from 'path'
 import { Hook } from './types'
 
 // <templateName, Hook[]>
-export const ON_CREATE_HOOKS = new Map<string, Hook[]>()
+export const AFTER_CREATE = new Map<string, Hook[]>()
 
 export const addOnCreateHook = (templateName: string, hook: Hook) => {
-  const hooks = ON_CREATE_HOOKS.get(templateName) || []
+  const hooks = AFTER_CREATE.get(templateName) || []
   hooks.push(hook)
-  ON_CREATE_HOOKS.set(templateName, hooks)
+  AFTER_CREATE.set(templateName, hooks)
 }
 
 const PROJECT_NAME_REPLACE_KEY = '[DYNAMIC_PROJECT_NAME]'

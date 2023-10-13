@@ -6,7 +6,7 @@ import prompts from 'prompts'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
-import { ON_CREATE_HOOKS } from './hooks/on-create'
+import { AFTER_CREATE } from './hooks/on-create'
 
 const directoryName = 'templates'
 const config = {
@@ -124,7 +124,7 @@ async function main() {
   })
 
   try {
-    const hooks = ON_CREATE_HOOKS.get(templateName) || []
+    const hooks = AFTER_CREATE.get(templateName) || []
     hooks.forEach((hook) => {
       hook({
         projectName,
