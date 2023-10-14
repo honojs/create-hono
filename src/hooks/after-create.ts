@@ -16,7 +16,7 @@ afterCreateHook.addHook(
   ({ projectName, directoryPath }) => {
     const wranglerPath = path.join(directoryPath, 'wrangler.toml')
     const wrangler = readFileSync(wranglerPath, 'utf-8')
-    const rewritten = wrangler.replace('%%PROJECT_NAME%%', projectName)
+    const rewritten = wrangler.replaceAll('%%PROJECT_NAME%%', projectName)
     writeFileSync(wranglerPath, rewritten)
   }
 )
