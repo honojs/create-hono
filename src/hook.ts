@@ -15,7 +15,7 @@ export class Hook<HookFunction extends (options: any) => any> {
     ...hookOptions: Parameters<HookFunction>
   ): ReturnType<HookFunction>[] {
     const hooks = this.#hookMap.get(templateName)
-    const results: any = []
+    const results: ReturnType<HookFunction>[] = []
     if (hooks) {
       hooks.forEach((hook) => {
         results.push(hook(hookOptions))
