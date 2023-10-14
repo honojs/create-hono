@@ -1,4 +1,4 @@
-export class Hook<HookFunction extends (options: any) => any> {
+export class Hook<HookFunction extends (...args: any[]) => any> {
   #hookMap: Map<string, HookFunction[]>
   constructor() {
     this.#hookMap = new Map<string, HookFunction[]>()
@@ -18,7 +18,7 @@ export class Hook<HookFunction extends (options: any) => any> {
     const results: ReturnType<HookFunction>[] = []
     if (hooks) {
       hooks.forEach((hook) => {
-        results.push(hook(hookOptions))
+        results.push(hook(...hookOptions))
       })
     }
     return results
