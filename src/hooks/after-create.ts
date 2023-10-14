@@ -1,23 +1,24 @@
 import { readFileSync, writeFileSync } from 'fs'
 import * as path from 'path'
-import { Hook } from './types'
+import { Hook } from '../hook'
 
-// <templateName, Hook[]>
-export const AFTER_CREATE = new Map<string, Hook[]>()
-
-export const addAfterCreateHook = (templateName: string, hook: Hook) => {
-  const hooks = AFTER_CREATE.get(templateName) || []
-  hooks.push(hook)
-  AFTER_CREATE.set(templateName, hooks)
+type AfterHookOptions = {
+  projectName: string
+  directoryPath: string
 }
 
-const PROJECT_NAME_REPLACE_KEY = '%%PROJECT_NAME%%'
+type AfterHookFunction = (options: AfterHookOptions) => void
 
-export const rewriteWranglerHook: Hook = ({ projectName, directoryPath }) => {
-  const wranglerPath = path.join(directoryPath, 'wrangler.toml')
-  const wrangler = readFileSync(wranglerPath, 'utf-8')
-  const rewritten = wrangler.replace(PROJECT_NAME_REPLACE_KEY, projectName)
-  writeFileSync(wranglerPath, rewritten)
-}
+const afterCreateHook = new Hook<AfterHookFunction>()
 
-addAfterCreateHook('cloudflare-workers', rewriteWranglerHook)
+afterCreateHook.addHook(
+  'cloudflare-workers',
+  ({ projectName, directoryPath }) => {
+    const wranglerPath = path.join(directoryPath, 'wrangler.toml')
+    const wrangler = readFileSync(wranglerPath, 'utf-8')
+    const rewritten = wrangler.replace('%%PROJECT_NAME%%', projectName)
+    writeFileSync(wranglerPath, rewritten)
+  }
+)
+
+export { afterCreateHook }
