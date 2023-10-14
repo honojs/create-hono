@@ -6,7 +6,7 @@ import prompts from 'prompts'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
-import { AFTER_CREATE } from './hooks/after-create'
+import { afterCreateHook } from './hooks/after-create'
 
 const directoryName = 'templates'
 const config = {
@@ -124,12 +124,9 @@ async function main() {
   })
 
   try {
-    const hooks = AFTER_CREATE.get(templateName) || []
-    hooks.forEach((hook) => {
-      hook({
-        projectName,
-        directoryPath: path.join(process.cwd(), target),
-      })
+    afterCreateHook.applyHook(templateName, {
+      projectName,
+      directoryPath: path.join(process.cwd(), target),
     })
   } catch (e) {
     throw new Error(`Error running hook for ${templateName}: ${e.message}`)

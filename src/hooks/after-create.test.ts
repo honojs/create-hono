@@ -1,10 +1,5 @@
 import * as path from 'path'
 import { describe, expect, it, vi } from 'vitest'
-import {
-  AFTER_CREATE,
-  addAfterCreateHook,
-  rewriteWranglerHook,
-} from './after-create'
 
 describe('addAfterCreateHook', () => {
   it('adds a hook to the AFTER_CREATE map', () => {
