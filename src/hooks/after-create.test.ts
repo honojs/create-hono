@@ -9,11 +9,9 @@ describe('afterCreateHook', () => {
         vi.mock('fs', () => {
           const wrangler = `
 name = "%%PROJECT_NAME%%"
-type = "javascript"
-account_id = "test-account-id"
-workers_dev = true
-route = ""
-zone_id = ""
+
+[env.staging]
+name = "%%PROJECT_NAME%%-staging"
       `.trim()
 
           return {
@@ -28,11 +26,9 @@ zone_id = ""
         const wranglerPath = join(directoryPath, 'wrangler.toml')
         const replaced = `
 name = "${projectName}"
-type = "javascript"
-account_id = "test-account-id"
-workers_dev = true
-route = ""
-zone_id = ""
+
+[env.staging]
+name = "${projectName}-staging"
     `.trim()
         afterCreateHook.applyHook('cloudflare-workers', {
           projectName,
