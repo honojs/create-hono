@@ -51,8 +51,8 @@ async function main() {
   let projectName = ''
   if (args._[0]) {
     target = args._[0].toString()
-    projectName = target
     console.log(`${bold(`${green(`✔`)} Using target directory`)} … ${target}`)
+    projectName = path.basename(target)
   } else {
     const answer = await prompts({
       type: 'text',
