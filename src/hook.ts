@@ -4,10 +4,13 @@ export class Hook<HookFunction extends (...args: any[]) => any> {
     this.#hookMap = new Map<string, HookFunction[]>()
   }
 
-  addHook(templateName: string, hook: HookFunction) {
-    const hooks = this.#hookMap.get(templateName) || []
-    hooks.push(hook)
-    this.#hookMap.set(templateName, hooks)
+  addHook(templateName: string | string[], hook: HookFunction) {
+    const names = Array.isArray(templateName) ? templateName : [templateName]
+    for (const name of names) {
+      const hooks = this.#hookMap.get(name) || []
+      hooks.push(hook)
+      this.#hookMap.set(name, hooks)
+    }
   }
 
   applyHook(
@@ -24,3 +27,16 @@ export class Hook<HookFunction extends (...args: any[]) => any> {
     return results
   }
 }
+
+/**
+ * After Hook
+ */
+
+type AfterHookOptions = {
+  projectName: string
+  directoryPath: string
+}
+
+type AfterHookFunction = (options: AfterHookOptions) => void
+
+export const afterCreateHook = new Hook<AfterHookFunction>()
