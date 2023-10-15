@@ -20,7 +20,9 @@ function mkdirp(dir: string) {
   try {
     fs.mkdirSync(dir, { recursive: true })
   } catch (e) {
-    if (e.code === 'EEXIST') return
+    if (e instanceof Error) {
+      if ('code' in e && e.code === 'EEXIST') return
+    }
     throw e
   }
 }
@@ -33,7 +35,7 @@ async function main() {
   const templateArg = args.template
 
   const templateDirs = await viaContentsApi(config)
-  const templates = {}
+  const templates: Record<string, { name: string }> = {}
 
   templateDirs.forEach((dir) => {
     let template = dir.replace(`${directoryName}/`, '')
@@ -129,7 +131,11 @@ async function main() {
       directoryPath: path.join(process.cwd(), target),
     })
   } catch (e) {
-    throw new Error(`Error running hook for ${templateName}: ${e.message}`)
+    throw new Error(
+      `Error running hook for ${templateName}: ${
+        e instanceof Error ? e.message : e
+      }`
+    )
   }
 
   console.log(bold(green('✔ Copied project files')))
