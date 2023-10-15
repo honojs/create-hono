@@ -3,6 +3,7 @@
   "version": "0.2.6",
   "scripts": {
     "build": "tsx ./build.ts",
+    "test": "vitest --run",
     "prepack": "yarn build",
     "release": "np"
   },
@@ -32,6 +33,7 @@
     "np": "^7.6.3",
     "prompts": "^2.4.2",
     "tsx": "^3.12.2",
+    "vitest": "^0.34.6",
     "yargs-parser": "^21.1.1"
   }
 }

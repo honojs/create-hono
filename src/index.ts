@@ -6,6 +6,7 @@ import prompts from 'prompts'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
+import { afterCreateHook } from './hooks/after-create'
 
 const directoryName = 'templates'
 const config = {
@@ -29,7 +30,6 @@ async function main() {
 
   let args = yargsParser(process.argv.slice(2))
 
-  const target = (args._[0] && String(args._[0])) || '.'
   const templateArg = args.template
 
   const templateDirs = await viaContentsApi(config)
@@ -44,6 +44,27 @@ async function main() {
     }
   })
   let templateNames = [...Object.values(templates)] as { name: string }[]
+
+  let target = ''
+  let projectName = ''
+  if (args._[0]) {
+    target = args._[0].toString()
+    projectName = target
+    console.log(`${bold(`${green(`✔`)} Using target directory`)} … ${target}`)
+  } else {
+    const answer = await prompts({
+      type: 'text',
+      name: 'target',
+      message: 'Target directory',
+      initial: 'my-app',
+    })
+    target = answer.target
+    if (answer.target === '.') {
+      projectName = path.basename(process.cwd())
+    } else {
+      projectName = path.basename(answer.target)
+    }
+  }
 
   const templateName =
     templateArg ||
@@ -101,6 +122,15 @@ async function main() {
       res({})
     })
   })
+
+  try {
+    afterCreateHook.applyHook(templateName, {
+      projectName,
+      directoryPath: path.join(process.cwd(), target),
+    })
+  } catch (e) {
+    throw new Error(`Error running hook for ${templateName}: ${e.message}`)
+  }
 
   console.log(bold(green('✔ Copied project files')))
 }
