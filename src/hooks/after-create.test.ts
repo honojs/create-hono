@@ -21,14 +21,14 @@ name = "%%PROJECT_NAME%%-staging"
         })
         const { readFileSync, writeFileSync } = await import('fs')
 
-        const projectName = 'test-project'
+        const projectName = 'test-projectNAME+123'
         const directoryPath = './tmp'
         const wranglerPath = join(directoryPath, 'wrangler.toml')
         const replaced = `
-name = "${projectName}"
+name = "test-projectname-123"
 
 [env.staging]
-name = "${projectName}-staging"
+name = "test-projectname-123-staging"
     `.trim()
         afterCreateHook.applyHook('cloudflare-workers', {
           projectName,
