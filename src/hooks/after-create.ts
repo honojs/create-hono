@@ -9,7 +9,8 @@ afterCreateHook.addHook(
   ({ projectName, directoryPath }) => {
     const wranglerPath = path.join(directoryPath, 'wrangler.toml')
     const wrangler = readFileSync(wranglerPath, 'utf-8')
-    const rewritten = wrangler.replaceAll(PROJECT_NAME, projectName)
+    const convertProjectName = projectName.toLowerCase().replaceAll(/[^a-z0-9\-_]/gm, "-")
+    const rewritten = wrangler.replaceAll(PROJECT_NAME, convertProjectName)
     writeFileSync(wranglerPath, rewritten)
   }
 )
