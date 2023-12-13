@@ -1,7 +1,7 @@
-import degit from 'degit'
 import fs from 'fs'
-import { bold, gray, green } from 'kleur/colors'
 import path from 'path'
+import degit from 'degit'
+import { bold, gray, green } from 'kleur/colors'
 import prompts from 'prompts'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
@@ -30,7 +30,7 @@ function mkdirp(dir: string) {
 async function main() {
   console.log(gray(`\ncreate-hono version ${version}`))
 
-  let args = yargsParser(process.argv.slice(2))
+  const args = yargsParser(process.argv.slice(2))
 
   const templateArg = args.template
 
@@ -38,20 +38,20 @@ async function main() {
   const templates: Record<string, { name: string }> = {}
 
   templateDirs.forEach((dir) => {
-    let template = dir.replace(`${directoryName}/`, '')
+    const template = dir.replace(`${directoryName}/`, '')
     if (!templates[template]) {
       templates[template] = {
         name: template,
       }
     }
   })
-  let templateNames = [...Object.values(templates)] as { name: string }[]
+  const templateNames = [...Object.values(templates)] as { name: string }[]
 
   let target = ''
   let projectName = ''
   if (args._[0]) {
     target = args._[0].toString()
-    console.log(`${bold(`${green(`✔`)} Using target directory`)} … ${target}`)
+    console.log(`${bold(`${green('✔')} Using target directory`)} … ${target}`)
     projectName = path.basename(target)
   } else {
     const answer = await prompts({
@@ -75,6 +75,7 @@ async function main() {
         type: 'select',
         name: 'template',
         message: 'Which template do you want to use?',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         choices: templateNames.map((template: any) => ({
           title: template.name,
           value: template.name,
@@ -107,7 +108,7 @@ async function main() {
     mkdirp(target)
   }
 
-  await new Promise((res, rej) => {
+  await new Promise((res) => {
     const emitter = degit(
       `${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
       {

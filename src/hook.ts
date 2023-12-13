@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class Hook<HookFunction extends (...args: any[]) => any> {
   #hookMap: Map<string, HookFunction[]>
   constructor() {
