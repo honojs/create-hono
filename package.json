@@ -5,7 +5,9 @@
     "build": "tsx ./build.ts",
     "test": "vitest --run",
     "prepack": "yarn build",
-    "release": "np"
+    "release": "np",
+    "lint": "eslint --ext js,ts src",
+    "lint:fix": "eslint --ext js,ts src --fix"
   },
   "bin": "./bin",
   "files": [
@@ -22,17 +24,20 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
+    "@hono/eslint-config": "^0.0.2",
     "@types/degit": "^2.8.3",
     "@types/node": "^18.11.18",
     "@types/prompts": "^2.4.2",
     "@types/yargs-parser": "^21.0.0",
     "degit": "^2.8.4",
     "esbuild": "^0.16.17",
+    "eslint": "^8.55.0",
     "kleur": "^4.1.5",
     "node-fetch": "^3.3.0",
     "np": "^7.6.3",
     "prompts": "^2.4.2",
     "tsx": "^3.12.2",
+    "typescript": "^5.3.3",
     "vitest": "^0.34.6",
     "yargs-parser": "^21.1.1"
   }
