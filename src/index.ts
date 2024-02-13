@@ -1,8 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import degit from 'degit'
 import { bold, gray, green } from 'kleur/colors'
 import prompts from 'prompts'
+// @ts-expect-error tiged does not have types
+import tiged from 'tiged'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
@@ -109,7 +110,7 @@ async function main() {
   }
 
   await new Promise((res) => {
-    const emitter = degit(
+    const emitter = tiged(
       `${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
       {
         cache: false,
@@ -117,7 +118,7 @@ async function main() {
       }
     )
 
-    emitter.on('info', (info) => {
+    emitter.on('info', (info: { message: string }) => {
       console.log(info.message)
     })
 
