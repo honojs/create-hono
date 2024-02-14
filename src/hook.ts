@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class Hook<HookFunction extends (...args: any[]) => any> {
+type HookSignature = (...args: any[]) => any;
+export class Hook<HookFunction extends HookSignature> {
   #hookMap: Map<string, HookFunction[]>
   constructor() {
     this.#hookMap = new Map<string, HookFunction[]>()
@@ -39,5 +40,15 @@ type AfterHookOptions = {
 }
 
 type AfterHookFunction = (options: AfterHookOptions) => void
-
 export const afterCreateHook = new Hook<AfterHookFunction>()
+
+/**
+ * Dependencies Hook
+ */
+
+type DependenciesHookOptions = {
+  directoryPath: string
+}
+
+type DependenciesHookFunction = (options: DependenciesHookOptions) => void;
+export const projectDependenciesHook = new Hook<DependenciesHookFunction>()
