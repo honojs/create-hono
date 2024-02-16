@@ -111,6 +111,8 @@ async function main() {
     mkdirp(target)
   }
 
+  const targetDirectoryPath = path.join(process.cwd(), target);
+
   await new Promise((res) => {
     const emitter = tiged(
       `${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
@@ -124,7 +126,7 @@ async function main() {
       console.log(info.message)
     })
 
-    emitter.clone(path.join(process.cwd(), target)).then(() => {
+    emitter.clone(targetDirectoryPath).then(() => {
       res({})
     })
   })
@@ -134,11 +136,11 @@ async function main() {
   try {
     afterCreateHook.applyHook(templateName, {
       projectName,
-      directoryPath: path.join(process.cwd(), target),
+      directoryPath: targetDirectoryPath,
     })
 
     await Promise.all(projectDependenciesHook.applyHook(templateName, {
-      directoryPath: path.join(process.cwd(), target),
+      directoryPath: targetDirectoryPath,
     }))
   } catch (e) {
     throw new Error(
@@ -149,6 +151,7 @@ async function main() {
   }
 
   console.log(bold(green('✔ Copied project files')))
+  console.log(gray('Get started with:'), bold(`cd ${target}`))
 }
 
 main()
