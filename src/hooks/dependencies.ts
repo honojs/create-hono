@@ -6,16 +6,15 @@ import { bold, green, red } from "kleur/colors";
 
 type PackageManager  = 'npm' | 'bun' | 'pnpm' | 'yarn'
 
-const KNOWN_PACKAGE_MANAGERS: {[key: string]: string} = {
+const knownPackageManagers: {[key: string]: string} = {
   'npm': 'npm install',
   'bun': 'bun install',
   'pnpm': 'pnpm install',
   'yarn': 'yarn'
 };
 
-const KNOWN_PACKAGE_MANAGER_NAMES = Object.keys(KNOWN_PACKAGE_MANAGERS);
-
-const CURRENT_PACKAGE_MANAGER = getCurrentPackageManager()
+const knownPackageManagerNames = Object.keys(knownPackageManagers);
+const currentPackageManager = getCurrentPackageManager();
 
 const registerInstallationHook = (template: string) => {
   if (template == "deno") return; // Deno needs no dependency installation step
@@ -37,21 +36,21 @@ const registerInstallationHook = (template: string) => {
         type: 'select',
         name: 'packageManager',
         message: 'Which package manager do you want to use?',
-        choices: KNOWN_PACKAGE_MANAGER_NAMES.map((template: string) => ({
+        choices: knownPackageManagerNames.map((template: string) => ({
           title: template,
           value: template,
         })),
-        initial: KNOWN_PACKAGE_MANAGER_NAMES.indexOf(CURRENT_PACKAGE_MANAGER),
+        initial: knownPackageManagerNames.indexOf(currentPackageManager),
       })
     );
 
     chdir(directoryPath);
 
-    if (!KNOWN_PACKAGE_MANAGERS[packageManager]) {
+    if (!knownPackageManagers[packageManager]) {
       exit(1)
     }
 
-    const proc = exec(KNOWN_PACKAGE_MANAGERS[packageManager])
+    const proc = exec(knownPackageManagers[packageManager])
 
     const procExit: number = await new Promise((res) => {
       proc.on("exit", (code) => res(code == null ? 0xff : code))
