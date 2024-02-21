@@ -4,3 +4,4 @@ bin
 package-lock.json
 yarn-error.log
 pnpm-lock.yaml
+test-dir

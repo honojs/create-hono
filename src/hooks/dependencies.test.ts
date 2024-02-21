@@ -4,7 +4,6 @@ import { Buffer } from 'buffer'
 import { afterAll, describe, expect, it } from 'vitest'
 import { existsSync, rmSync } from 'fs';
 import { cwd } from 'process';
-import { tmpdir } from 'os';
 
 let cmdBuffer = '';
 
@@ -25,6 +24,8 @@ const packageManagersLockfiles: {[key: string]: string} = {
 const packageManagers = Object.keys(packageManagersCommands)
 
 describe('dependenciesHook', () => {
+  afterAll(() => rmSync('test-dir', {recursive: true, force: true}))
+  
   describe.each(packageManagers.map(p => ({pm: p})))("$pm", ({pm}) => {
     const proc = execa(packageManagersCommands[pm][0], packageManagersCommands[pm].slice(1), {
       cwd: cwd(),
@@ -32,7 +33,7 @@ describe('dependenciesHook', () => {
       stdout: 'pipe',
       env: {...process.env, npm_config_user_agent: pm}
     });
-    const targetDirectory = tmpdir() + '/' + generateRandomAlphanumericString(8);
+    const targetDirectory = 'test-dir/' + generateRandomAlphanumericString(8);
 
     afterAll(() => {
       rmSync(targetDirectory, {recursive: true, force: true})
