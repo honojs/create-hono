@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "scripts": {
     "build": "tsx ./build.ts",
-    "bin": "./bin",
+    "bin": "yarn run build && ./bin",
     "test": "vitest --run",
     "prepack": "yarn build",
     "release": "np",
