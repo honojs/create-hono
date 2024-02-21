@@ -109,23 +109,12 @@ const generateRandomAlphanumericString = (length: number): string => {
   return result;
 };
 
-const procOutput = (proc: ExecaChildProcess<string>) => new Promise((res, rej) => {
-  proc.stdout?.once('data', res);
-  proc.stderr?.once('data', rej);
-
-  proc.stdout?.once('error', rej);
-  proc.stderr?.once('error', rej);
-})
-
 const timeout = (milliseconds: number) => new Promise((res, rej) => setTimeout(res, milliseconds));
 
 /**
  * Utility to mock the stdin of the cli. You must provide the correct number of
  * questions correctly typed or the process will keep waiting for input.
- * @param {ExecaChildProcess<string>} process
- * @param {Array<{question: string, answer: string|string[]}>} questions
- * @param {Array<number>} prompts
- *  - questions that you know the CLI will ask and respective answers to mock
+ * https://github.com/netlify/cli/blob/0c91f20e14e84e9b21d39d592baf10c7abd8f37c/tests/integration/utils/handle-questions.js#L11
  */
 const handleQuestions = (process: ExecaChildProcess<string>, questions: {question: string, answer: string| string[]}[]) => new Promise<string>((res, rej) => {
   process.stdout?.on('data', (data) => {
