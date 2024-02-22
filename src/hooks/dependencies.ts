@@ -1,8 +1,8 @@
-import { chdir, exit } from "process";
-import { projectDependenciesHook } from "../hook";
-import { exec } from "child_process";
+import { exec } from 'child_process'
+import { chdir, exit } from 'process'
+import { bold, green, red } from 'kleur/colors'
 import prompts from 'prompts'
-import { bold, green, red } from "kleur/colors";
+import { projectDependenciesHook } from '../hook'
 
 type PackageManager  = 'npm' | 'bun' | 'pnpm' | 'yarn'
 
@@ -11,13 +11,13 @@ const knownPackageManagers: {[key: string]: string} = {
   'bun': 'bun install',
   'pnpm': 'pnpm install',
   'yarn': 'yarn'
-};
+}
 
-const knownPackageManagerNames = Object.keys(knownPackageManagers);
-const currentPackageManager = getCurrentPackageManager();
+const knownPackageManagerNames = Object.keys(knownPackageManagers)
+const currentPackageManager = getCurrentPackageManager()
 
 const registerInstallationHook = (template: string) => {
-  if (template == "deno") return; // Deno needs no dependency installation step
+  if (template == 'deno') return // Deno needs no dependency installation step
 
   projectDependenciesHook.addHook(template, async ({directoryPath}) => {
     const {installDeps} = (
@@ -29,7 +29,7 @@ const registerInstallationHook = (template: string) => {
       })
     )
 
-    if (!installDeps) return;
+    if (!installDeps) return
 
     const {packageManager} = (
       await prompts({
@@ -42,9 +42,9 @@ const registerInstallationHook = (template: string) => {
         })),
         initial: knownPackageManagerNames.indexOf(currentPackageManager),
       })
-    );
+    )
 
-    chdir(directoryPath);
+    chdir(directoryPath)
 
     if (!knownPackageManagers[packageManager]) {
       exit(1)
@@ -53,8 +53,8 @@ const registerInstallationHook = (template: string) => {
     const proc = exec(knownPackageManagers[packageManager])
 
     const procExit: number = await new Promise((res) => {
-      proc.on("exit", (code) => res(code == null ? 0xff : code))
-    });
+      proc.on('exit', (code) => res(code == null ? 0xff : code))
+    })
 
     if (procExit == 0) {
       console.log(bold(`${green('✔')} Installed project dependencies`))
@@ -63,18 +63,18 @@ const registerInstallationHook = (template: string) => {
       exit(procExit)
     }
 
-    return;
+    return
   })
 }
 
 function getCurrentPackageManager(): PackageManager {
-  const agent = process.env.npm_config_user_agent || "npm"; // Types say it might be undefined, just being cautious;
+  const agent = process.env.npm_config_user_agent || 'npm' // Types say it might be undefined, just being cautious;
 
-  if (agent.startsWith('bun')) return 'bun';
-  else if (agent.startsWith('pnpm')) return 'pnpm';
-  else if (agent.startsWith('yarn')) return 'yarn';
+  if (agent.startsWith('bun')) return 'bun'
+  else if (agent.startsWith('pnpm')) return 'pnpm'
+  else if (agent.startsWith('yarn')) return 'yarn'
 
   return 'npm'
 }
 
-export { registerInstallationHook };
+export { registerInstallationHook }

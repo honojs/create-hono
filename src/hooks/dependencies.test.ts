@@ -1,11 +1,12 @@
-import {execa, ExecaChildProcess, execaSync} from 'execa';
 import { Buffer } from 'buffer'
 
+import { existsSync, rmSync } from 'fs'
+import { cwd } from 'process'
+import {execa, execaSync} from 'execa'
+import type { ExecaChildProcess} from 'execa'
 import { afterAll, describe, expect, it } from 'vitest'
-import { existsSync, rmSync } from 'fs';
-import { cwd } from 'process';
 
-let cmdBuffer = '';
+let cmdBuffer = ''
 
 const packageManagersCommands: {[key: string]: string[]} = {
   'npm': 'npm run bin'.split(' '),
@@ -22,40 +23,40 @@ const packageManagersLockfiles: {[key: string]: string} = {
 }
 
 const availablePackageManagers = Object.keys(packageManagersCommands).filter(p => {
-  let stderr = '';
+  let stderr = ''
 
   try {
-    const {stderr: err} = execaSync(p, ['-h']);
-    stderr = err;
+    const {stderr: err} = execaSync(p, ['-h'])
+    stderr = err
   } catch {}
 
   return stderr.length == 0
 })
 
 // Run build to have ./bin
-execaSync('yarn', 'run build'.split(' '));
-execaSync('chmod', ['+x', './bin']);
+execaSync('yarn', 'run build'.split(' '))
+execaSync('chmod', ['+x', './bin'])
 
 describe('dependenciesHook', async () => {
   afterAll(() => {
     rmSync('test-dir', {recursive: true, force: true})
     rmSync('bin') // Might be beneficial to remove the bin file
-  });
+  })
 
-  describe.each(availablePackageManagers)("$pm", pm => {
+  describe.each(availablePackageManagers)('$pm', pm => {
     const proc = execa(packageManagersCommands[pm][0], packageManagersCommands[pm].slice(1), {
       cwd: cwd(),
       stdin: 'pipe',
       stdout: 'pipe',
       env: {...process.env, npm_config_user_agent: pm}
-    });
-    const targetDirectory = 'test-dir/' + generateRandomAlphanumericString(8);
+    })
+    const targetDirectory = 'test-dir/' + generateRandomAlphanumericString(8)
 
     afterAll(() => {
       rmSync(targetDirectory, {recursive: true, force: true})
     })
 
-    it("should ask for a target directory", async () => {
+    it('should ask for a target directory', async () => {
       const out = await handleQuestions(proc, [
         {
           question: 'Target directory',
@@ -72,9 +73,9 @@ describe('dependenciesHook', async () => {
           question: 'Which template do you want to use?',
           answer: CONFIRM // Should pick aws-lambda
         }
-      ]);
+      ])
 
-      expect(out, "Selected aws-lambda")
+      expect(out, 'Selected aws-lambda')
     })
 
     it('should ask if you want to install dependencies', async () => {
@@ -83,9 +84,9 @@ describe('dependenciesHook', async () => {
           question: 'Do you want to install project dependencies?',
           answer: CONFIRM // Should pick Y
         }
-      ]);
+      ])
 
-      expect(out, "Installing dependencies")
+      expect(out, 'Installing dependencies')
     })
 
     it('should ask for which package manager to use', async () => {
@@ -94,7 +95,7 @@ describe('dependenciesHook', async () => {
           question: 'Which package manager do you want to use?',
           answer: CONFIRM // Should pick current package manager
         }
-      ]);
+      ])
 
       expect(out.trim().includes(pm), `Current package manager '${pm}' was picked`)
     })
@@ -102,11 +103,11 @@ describe('dependenciesHook', async () => {
     it('should have installed dependencies', async () => {
       while(!existsSync(targetDirectory + '/node_modules')) await timeout(3_000) // 3 seconds;
 
-      expect(existsSync(targetDirectory + '/node_modules'), "node_modules directory exists")
+      expect(existsSync(targetDirectory + '/node_modules'), 'node_modules directory exists')
     })
 
     it('should have package manager specific lock file (' + packageManagersLockfiles[pm] + ')', async () => {
-      expect(existsSync(targetDirectory + '/' + packageManagersLockfiles[pm]), "lockfile exists")
+      expect(existsSync(targetDirectory + '/' + packageManagersLockfiles[pm]), 'lockfile exists')
 
       cmdBuffer = ''
     })
@@ -114,25 +115,25 @@ describe('dependenciesHook', async () => {
 })
 
 const generateRandomAlphanumericString = (length: number): string => {
-  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
+  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  let result = ''
 
   for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * alphabet.length);
-    result += alphabet[randomIndex];
+    const randomIndex = Math.floor(Math.random() * alphabet.length)
+    result += alphabet[randomIndex]
   }
 
-  return result;
-};
+  return result
+}
 
-const timeout = (milliseconds: number) => new Promise((res, rej) => setTimeout(res, milliseconds));
+const timeout = (milliseconds: number) => new Promise(res => setTimeout(res, milliseconds))
 
 /**
  * Utility to mock the stdin of the cli. You must provide the correct number of
  * questions correctly typed or the process will keep waiting for input.
  * https://github.com/netlify/cli/blob/0c91f20e14e84e9b21d39d592baf10c7abd8f37c/tests/integration/utils/handle-questions.js#L11
  */
-const handleQuestions = (process: ExecaChildProcess<string>, questions: {question: string, answer: string| string[]}[]) => new Promise<string>((res, rej) => {
+const handleQuestions = (process: ExecaChildProcess<string>, questions: {question: string, answer: string| string[]}[]) => new Promise<string>(res => {
   process.stdout?.on('data', (data) => {
     cmdBuffer = (cmdBuffer + data).replace(/\n/g, '')
     const index = questions.findIndex(
@@ -150,7 +151,7 @@ const handleQuestions = (process: ExecaChildProcess<string>, questions: {questio
 
 const writeResponse = (process: ExecaChildProcess<string>, responses: string[]) => {
   const response = responses.shift()
-  if (!response) return;
+  if (!response) return
 
   if (!response.endsWith(CONFIRM)) process.stdin?.write(Buffer.from(response + CONFIRM))
   else process.stdin?.write(Buffer.from(response))

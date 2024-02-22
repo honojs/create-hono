@@ -7,9 +7,9 @@ import tiged from 'tiged'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
+import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
 import { registerInstallationHook } from './hooks/dependencies'
-import { projectDependenciesHook } from './hook'
 
 const directoryName = 'templates'
 const config = {
@@ -111,7 +111,7 @@ async function main() {
     mkdirp(target)
   }
 
-  const targetDirectoryPath = path.join(process.cwd(), target);
+  const targetDirectoryPath = path.join(process.cwd(), target)
 
   await new Promise((res) => {
     const emitter = tiged(
