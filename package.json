@@ -8,7 +8,9 @@
     "prepack": "yarn build",
     "release": "np",
     "lint": "eslint --ext js,ts src",
-    "lint:fix": "eslint --ext js,ts src --fix"
+    "lint:fix": "eslint --ext js,ts src --fix",
+    "format": "prettier src --check",
+    "format:fix": "prettier src --write"
   },
   "bin": "./bin",
   "files": [
@@ -36,6 +38,7 @@
     "kleur": "^4.1.5",
     "node-fetch": "^3.3.0",
     "np": "^7.6.3",
+    "prettier": "^3.2.5",
     "prompts": "^2.4.2",
     "tiged": "^2.12.7",
     "tsx": "^3.12.2",
