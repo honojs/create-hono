@@ -37,7 +37,10 @@ execaSync('yarn', 'run build'.split(' '));
 execaSync('chmod', ['+x', './bin']);
 
 describe('dependenciesHook', async () => {
-  afterAll(() => rmSync('test-dir', {recursive: true, force: true}))
+  afterAll(() => {
+    rmSync('test-dir', {recursive: true, force: true})
+    rmSync('bin') // Might be beneficial to remove the bin file
+  });
 
   describe.each(availablePackageManagers)("$pm", pm => {
     const proc = execa(packageManagersCommands[pm][0], packageManagersCommands[pm].slice(1), {
