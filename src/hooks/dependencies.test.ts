@@ -1,4 +1,4 @@
-import {execa, ExecaChildProcess} from 'execa';
+import {execa, ExecaChildProcess, execaSync} from 'execa';
 import { Buffer } from 'buffer'
 
 import { afterAll, describe, expect, it } from 'vitest'
@@ -21,12 +21,25 @@ const packageManagersLockfiles: {[key: string]: string} = {
   'yarn': 'yarn.lock'
 }
 
-const packageManagers = Object.keys(packageManagersCommands)
+const availablePackageManagers = Object.keys(packageManagersCommands).filter(p => {
+  let stderr = '';
 
-describe('dependenciesHook', () => {
+  try {
+    const {stderr: err} = execaSync(p, ['-h']);
+    stderr = err;
+  } catch {}
+
+  return stderr.length == 0
+})
+
+// Run build to have ./bin
+execaSync('yarn', 'run build'.split(' '));
+execaSync('chmod', ['+x', './bin']);
+
+describe('dependenciesHook', async () => {
   afterAll(() => rmSync('test-dir', {recursive: true, force: true}))
-  
-  describe.each(packageManagers.map(p => ({pm: p})))("$pm", ({pm}) => {
+
+  describe.each(availablePackageManagers)("$pm", pm => {
     const proc = execa(packageManagersCommands[pm][0], packageManagersCommands[pm].slice(1), {
       cwd: cwd(),
       stdin: 'pipe',
@@ -39,7 +52,7 @@ describe('dependenciesHook', () => {
       rmSync(targetDirectory, {recursive: true, force: true})
     })
 
-    it("should ask for a target directory", async (ctx) => {
+    it("should ask for a target directory", async () => {
       const out = await handleQuestions(proc, [
         {
           question: 'Target directory',
