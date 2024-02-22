@@ -119,7 +119,7 @@ async function main() {
       {
         cache: false,
         force: true,
-      }
+      },
     )
 
     emitter.on('info', (info: { message: string }) => {
@@ -139,14 +139,16 @@ async function main() {
       directoryPath: targetDirectoryPath,
     })
 
-    await Promise.all(projectDependenciesHook.applyHook(templateName, {
-      directoryPath: targetDirectoryPath,
-    }))
+    await Promise.all(
+      projectDependenciesHook.applyHook(templateName, {
+        directoryPath: targetDirectoryPath,
+      }),
+    )
   } catch (e) {
     throw new Error(
       `Error running hook for ${templateName}: ${
         e instanceof Error ? e.message : e
-      }`
+      }`,
     )
   }
 

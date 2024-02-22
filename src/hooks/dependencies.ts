@@ -4,13 +4,13 @@ import { bold, green, red } from 'kleur/colors'
 import prompts from 'prompts'
 import { projectDependenciesHook } from '../hook'
 
-type PackageManager  = 'npm' | 'bun' | 'pnpm' | 'yarn'
+type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
 
-const knownPackageManagers: {[key: string]: string} = {
-  'npm': 'npm install',
-  'bun': 'bun install',
-  'pnpm': 'pnpm install',
-  'yarn': 'yarn'
+const knownPackageManagers: { [key: string]: string } = {
+  npm: 'npm install',
+  bun: 'bun install',
+  pnpm: 'pnpm install',
+  yarn: 'yarn',
 }
 
 const knownPackageManagerNames = Object.keys(knownPackageManagers)
@@ -19,30 +19,26 @@ const currentPackageManager = getCurrentPackageManager()
 const registerInstallationHook = (template: string) => {
   if (template == 'deno') return // Deno needs no dependency installation step
 
-  projectDependenciesHook.addHook(template, async ({directoryPath}) => {
-    const {installDeps} = (
-      await prompts({
-        type: 'confirm',
-        name: 'installDeps',
-        message: 'Do you want to install project dependencies?',
-        initial: true,
-      })
-    )
+  projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
+    const { installDeps } = await prompts({
+      type: 'confirm',
+      name: 'installDeps',
+      message: 'Do you want to install project dependencies?',
+      initial: true,
+    })
 
     if (!installDeps) return
 
-    const {packageManager} = (
-      await prompts({
-        type: 'select',
-        name: 'packageManager',
-        message: 'Which package manager do you want to use?',
-        choices: knownPackageManagerNames.map((template: string) => ({
-          title: template,
-          value: template,
-        })),
-        initial: knownPackageManagerNames.indexOf(currentPackageManager),
-      })
-    )
+    const { packageManager } = await prompts({
+      type: 'select',
+      name: 'packageManager',
+      message: 'Which package manager do you want to use?',
+      choices: knownPackageManagerNames.map((template: string) => ({
+        title: template,
+        value: template,
+      })),
+      initial: knownPackageManagerNames.indexOf(currentPackageManager),
+    })
 
     chdir(directoryPath)
 
