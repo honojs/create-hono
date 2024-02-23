@@ -24,12 +24,16 @@ const packageManagersLockfiles: { [key: string]: string } = {
 
 const availablePackageManagers = Object.keys(packageManagersCommands).filter(
   (p) => {
+    if (p === 'npm') return true // Skip check for npm because it's most likely here and for some wierd reason, it returns an exitCode of 1 from `npm -h`
+
     let stderr = ''
 
     try {
       const { stderr: err } = execaSync(p, ['-h'])
       stderr = err
-    } catch {}
+    } catch (error) {
+      stderr = error as string
+    }
 
     return stderr.length == 0
   },
@@ -45,9 +49,9 @@ describe('dependenciesHook', async () => {
     rmSync('bin') // Might be beneficial to remove the bin file
   })
 
-  describe.each(availablePackageManagers)(
+  describe.each(availablePackageManagers.map((p) => ({ pm: p })))(
     '$pm',
-    (pm) => {
+    ({ pm }) => {
       const proc = execa(
         packageManagersCommands[pm][0],
         packageManagersCommands[pm].slice(1),
