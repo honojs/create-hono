@@ -23,7 +23,7 @@ export const viaContentsApi = async ({
 }: Options) => {
   const files = []
   const contents = await api(
-    `${user}/${repository}/contents/${directory}?ref=${ref}`
+    `${user}/${repository}/contents/${directory}?ref=${ref}`,
   )
 
   if ('message' in contents) {

@@ -14,7 +14,7 @@ afterCreateHook.addHook(
       .replaceAll(/[^a-z0-9\-_]/gm, '-')
     const rewritten = wrangler.replaceAll(PROJECT_NAME, convertProjectName)
     writeFileSync(wranglerPath, rewritten)
-  }
+  },
 )
 
 export { afterCreateHook }

@@ -7,7 +7,9 @@ import tiged from 'tiged'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { viaContentsApi } from './github.js'
+import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
+import { registerInstallationHook } from './hooks/dependencies'
 
 const directoryName = 'templates'
 const config = {
@@ -109,38 +111,49 @@ async function main() {
     mkdirp(target)
   }
 
+  const targetDirectoryPath = path.join(process.cwd(), target)
+
   await new Promise((res) => {
     const emitter = tiged(
       `${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
       {
         cache: false,
         force: true,
-      }
+      },
     )
 
     emitter.on('info', (info: { message: string }) => {
       console.log(info.message)
     })
 
-    emitter.clone(path.join(process.cwd(), target)).then(() => {
+    emitter.clone(targetDirectoryPath).then(() => {
       res({})
     })
   })
 
+  registerInstallationHook(templateName)
+
   try {
     afterCreateHook.applyHook(templateName, {
       projectName,
-      directoryPath: path.join(process.cwd(), target),
+      directoryPath: targetDirectoryPath,
     })
+
+    await Promise.all(
+      projectDependenciesHook.applyHook(templateName, {
+        directoryPath: targetDirectoryPath,
+      }),
+    )
   } catch (e) {
     throw new Error(
       `Error running hook for ${templateName}: ${
         e instanceof Error ? e.message : e
-      }`
+      }`,
     )
   }
 
   console.log(bold(green('✔ Copied project files')))
+  console.log(gray('Get started with:'), bold(`cd ${target}`))
 }
 
 main()
