@@ -117,7 +117,7 @@ describe('dependenciesHook', async () => {
 
       it('should have installed dependencies', async () => {
         while (!existsSync(targetDirectory + '/node_modules'))
-          await timeout(3_000) // 3 seconds;
+          await timeout(5_000) // 3 seconds;
 
         expect(
           existsSync(targetDirectory + '/node_modules'),
