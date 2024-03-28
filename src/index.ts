@@ -3,7 +3,7 @@ import path from 'path'
 import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
-import { bold, gray, green } from 'kleur/colors'
+import chalk from 'chalk'
 import ora from 'ora'
 // @ts-expect-error tiged does not have types
 import tiged from 'tiged'
@@ -48,7 +48,7 @@ function mkdirp(dir: string) {
 }
 
 async function main() {
-  console.log(gray(`\ncreate-hono version ${version}`))
+  console.log(chalk.gray(`\ncreate-hono version ${version}`))
 
   const args = yargsParser(process.argv.slice(2))
 
@@ -70,7 +70,9 @@ async function main() {
   let projectName = ''
   if (args._[0]) {
     target = args._[0].toString()
-    console.log(`${bold(`${green('✔')} Using target directory`)} … ${target}`)
+    console.log(
+      `${chalk.bold(`${chalk.green('✔')} Using target directory`)} … ${target}`,
+    )
     projectName = path.basename(target)
   } else {
     const answer = await input({
@@ -108,6 +110,7 @@ async function main() {
     if (fs.readdirSync(target).length > 0) {
       const response = await confirm({
         message: 'Directory not empty. Continue?',
+        default: false,
       })
       if (!response) {
         process.exit(1)
@@ -130,6 +133,7 @@ async function main() {
     )
     emitter.clone(targetDirectoryPath).then(() => {
       spinner.stop().clear()
+      console.log(`${chalk.green('✔')} Cloned the template`)
       res({})
     })
   })
@@ -155,8 +159,8 @@ async function main() {
     )
   }
 
-  console.log(bold(green('✔ Copied project files')))
-  console.log(gray('Get started with:'), bold(`cd ${target}`))
+  console.log(chalk.green('✔ ' + chalk.bold('Copied project files')))
+  console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
 }
 
 main()

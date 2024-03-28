@@ -2,7 +2,7 @@ import { exec } from 'child_process'
 import { chdir, exit } from 'process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
-import { bold, green, red } from 'kleur/colors'
+import chalk from 'chalk'
 import ora from 'ora'
 import { projectDependenciesHook } from '../hook'
 
@@ -53,9 +53,9 @@ const registerInstallationHook = (template: string) => {
     spinner.stop().clear()
 
     if (procExit == 0) {
-      console.log(bold(`${green('✔')} Installed project dependencies`))
+      console.log(`${chalk.green('✔')} Installed project dependencies`)
     } else {
-      console.log(bold(`${red('×')} Failed to install project dependencies`))
+      console.log(`${chalk.red('×')} Failed to install project dependencies`)
       exit(procExit)
     }
 
