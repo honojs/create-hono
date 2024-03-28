@@ -1,6 +1,7 @@
 import { exec } from 'child_process'
 import { chdir, exit } from 'process'
 import { bold, green, red } from 'kleur/colors'
+import ora from 'ora'
 import prompts from 'prompts'
 import { projectDependenciesHook } from '../hook'
 
@@ -46,11 +47,14 @@ const registerInstallationHook = (template: string) => {
       exit(1)
     }
 
+    const spinner = ora('Installing project dependencies').start()
     const proc = exec(knownPackageManagers[packageManager])
 
     const procExit: number = await new Promise((res) => {
       proc.on('exit', (code) => res(code == null ? 0xff : code))
     })
+
+    spinner.stop().clear()
 
     if (procExit == 0) {
       console.log(bold(`${green('✔')} Installed project dependencies`))
