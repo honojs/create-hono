@@ -48,7 +48,7 @@ function mkdirp(dir: string) {
 }
 
 async function main() {
-  console.log(chalk.gray(`\ncreate-hono version ${version}`))
+  console.log(chalk.gray(`create-hono version ${version}`))
 
   const args = yargsParser(process.argv.slice(2))
 
@@ -132,8 +132,9 @@ async function main() {
       },
     )
     emitter.clone(targetDirectoryPath).then(() => {
-      spinner.stop().clear()
-      console.log(`${chalk.green('✔')} Cloned the template`)
+      spinner.stopAndPersist({
+        symbol: chalk.green('✔'),
+      })
       res({})
     })
   })
@@ -159,7 +160,7 @@ async function main() {
     )
   }
 
-  console.log(chalk.green('✔ ' + chalk.bold('Copied project files')))
+  console.log(chalk.green('🎉  ' + chalk.bold('Copied project files')))
   console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
 }
 

@@ -53,7 +53,9 @@ const registerInstallationHook = (template: string) => {
     spinner.stop().clear()
 
     if (procExit == 0) {
-      console.log(`${chalk.green('✔')} Installed project dependencies`)
+      spinner.stopAndPersist({
+        symbol: chalk.green('✔'),
+      })
     } else {
       console.log(`${chalk.red('×')} Failed to install project dependencies`)
       exit(procExit)
