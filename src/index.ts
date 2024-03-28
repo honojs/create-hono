@@ -6,7 +6,6 @@ import prompts from 'prompts'
 import tiged from 'tiged'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
-import { viaContentsApi } from './github.js'
 import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
 import { registerInstallationHook } from './hooks/dependencies'
@@ -18,6 +17,21 @@ const config = {
   user: 'honojs',
   ref: 'main',
 }
+
+const templateDirs = [
+  'templates/aws-lambda',
+  'templates/bun',
+  'templates/cloudflare-pages',
+  'templates/cloudflare-workers',
+  'templates/deno',
+  'templates/fastly',
+  'templates/lambda-edge',
+  'templates/netlify',
+  'templates/nextjs',
+  'templates/nodejs',
+  'templates/vercel',
+  'templates/x-basic',
+]
 
 function mkdirp(dir: string) {
   try {
@@ -37,7 +51,6 @@ async function main() {
 
   const templateArg = args.template
 
-  const templateDirs = await viaContentsApi(config)
   const templates: Record<string, { name: string }> = {}
 
   templateDirs.forEach((dir) => {
