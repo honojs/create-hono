@@ -160,7 +160,7 @@ async function main() {
     )
   }
 
-  console.log(chalk.green('🎉  ' + chalk.bold('Copied project files')))
+  console.log(chalk.green('🎉 ' + chalk.bold('Copied project files')))
   console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
 }
 
