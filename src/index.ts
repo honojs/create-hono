@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { bold, gray, green } from 'kleur/colors'
+import ora from 'ora'
 import prompts from 'prompts'
 // @ts-expect-error tiged does not have types
 import tiged from 'tiged'
@@ -125,6 +126,7 @@ async function main() {
   }
 
   const targetDirectoryPath = path.join(process.cwd(), target)
+  const spinner = ora('Cloning the template').start()
 
   await new Promise((res) => {
     const emitter = tiged(
@@ -134,12 +136,8 @@ async function main() {
         force: true,
       },
     )
-
-    emitter.on('info', (info: { message: string }) => {
-      console.log(info.message)
-    })
-
     emitter.clone(targetDirectoryPath).then(() => {
+      spinner.stop().clear()
       res({})
     })
   })
