@@ -1,8 +1,9 @@
 import fs from 'fs'
 import path from 'path'
+import confirm from '@inquirer/confirm'
+import { input, select } from '@inquirer/prompts'
 import { bold, gray, green } from 'kleur/colors'
 import ora from 'ora'
-import prompts from 'prompts'
 // @ts-expect-error tiged does not have types
 import tiged from 'tiged'
 import yargsParser from 'yargs-parser'
@@ -71,36 +72,29 @@ async function main() {
     console.log(`${bold(`${green('✔')} Using target directory`)} … ${target}`)
     projectName = path.basename(target)
   } else {
-    const answer = await prompts({
-      type: 'text',
-      name: 'target',
+    const answer = await input({
       message: 'Target directory',
-      initial: 'my-app',
+      default: 'my-app',
     })
-    target = answer.target
-    if (answer.target === '.') {
+    target = answer
+    if (answer === '.') {
       projectName = path.basename(process.cwd())
     } else {
-      projectName = path.basename(answer.target)
+      projectName = path.basename(answer)
     }
   }
 
   const templateName =
     templateArg ||
-    (
-      await prompts({
-        type: 'select',
-        name: 'template',
-        message: 'Which template do you want to use?',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        choices: templateNames.map((template: any) => ({
-          title: template.name,
-          value: template.name,
-        })),
-        initial: 0,
-      })
-    ).template
-
+    (await select({
+      loop: true,
+      message: 'Which template do you want to use?',
+      choices: templateNames.map((template: { name: string }) => ({
+        title: template.name,
+        value: template.name,
+      })),
+      default: 0,
+    }))
   if (!templateName) {
     throw new Error('No template selected')
   }
@@ -111,13 +105,10 @@ async function main() {
 
   if (fs.existsSync(target)) {
     if (fs.readdirSync(target).length > 0) {
-      const response = await prompts({
-        type: 'confirm',
-        name: 'value',
+      const response = await confirm({
         message: 'Directory not empty. Continue?',
-        initial: false,
       })
-      if (!response.value) {
+      if (!response) {
         process.exit(1)
       }
     }

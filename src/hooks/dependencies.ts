@@ -1,8 +1,9 @@
 import { exec } from 'child_process'
 import { chdir, exit } from 'process'
+import confirm from '@inquirer/confirm'
+import { select } from '@inquirer/prompts'
 import { bold, green, red } from 'kleur/colors'
 import ora from 'ora'
-import prompts from 'prompts'
 import { projectDependenciesHook } from '../hook'
 
 type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
@@ -21,24 +22,19 @@ const registerInstallationHook = (template: string) => {
   if (template == 'deno') return // Deno needs no dependency installation step
 
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
-    const { installDeps } = await prompts({
-      type: 'confirm',
-      name: 'installDeps',
+    const installDeps = await confirm({
       message: 'Do you want to install project dependencies?',
-      initial: true,
+      default: true,
     })
 
     if (!installDeps) return
-
-    const { packageManager } = await prompts({
-      type: 'select',
-      name: 'packageManager',
+    const packageManager = await select({
       message: 'Which package manager do you want to use?',
       choices: knownPackageManagerNames.map((template: string) => ({
         title: template,
         value: template,
       })),
-      initial: knownPackageManagerNames.indexOf(currentPackageManager),
+      default: knownPackageManagerNames.indexOf(currentPackageManager),
     })
 
     chdir(directoryPath)
