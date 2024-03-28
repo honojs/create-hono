@@ -1,8 +1,9 @@
 import { exec } from 'child_process'
 import { chdir, exit } from 'process'
-import { bold, green, red } from 'kleur/colors'
+import confirm from '@inquirer/confirm'
+import select from '@inquirer/select'
+import chalk from 'chalk'
 import ora from 'ora'
-import prompts from 'prompts'
 import { projectDependenciesHook } from '../hook'
 
 type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
@@ -21,24 +22,19 @@ const registerInstallationHook = (template: string) => {
   if (template == 'deno') return // Deno needs no dependency installation step
 
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
-    const { installDeps } = await prompts({
-      type: 'confirm',
-      name: 'installDeps',
+    const installDeps = await confirm({
       message: 'Do you want to install project dependencies?',
-      initial: true,
+      default: true,
     })
 
     if (!installDeps) return
-
-    const { packageManager } = await prompts({
-      type: 'select',
-      name: 'packageManager',
+    const packageManager = await select({
       message: 'Which package manager do you want to use?',
       choices: knownPackageManagerNames.map((template: string) => ({
         title: template,
         value: template,
       })),
-      initial: knownPackageManagerNames.indexOf(currentPackageManager),
+      default: knownPackageManagerNames.indexOf(currentPackageManager),
     })
 
     chdir(directoryPath)
@@ -57,9 +53,9 @@ const registerInstallationHook = (template: string) => {
     spinner.stop().clear()
 
     if (procExit == 0) {
-      console.log(bold(`${green('✔')} Installed project dependencies`))
+      console.log(`${chalk.green('✔')} Installed project dependencies`)
     } else {
-      console.log(bold(`${red('×')} Failed to install project dependencies`))
+      console.log(`${chalk.red('×')} Failed to install project dependencies`)
       exit(procExit)
     }
 
