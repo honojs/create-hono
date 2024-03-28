@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import confirm from '@inquirer/confirm'
-import { input, select } from '@inquirer/prompts'
+import input from '@inquirer/input'
+import select from '@inquirer/select'
 import { bold, gray, green } from 'kleur/colors'
 import ora from 'ora'
 // @ts-expect-error tiged does not have types

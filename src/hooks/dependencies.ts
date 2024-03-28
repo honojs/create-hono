@@ -1,7 +1,7 @@
 import { exec } from 'child_process'
 import { chdir, exit } from 'process'
 import confirm from '@inquirer/confirm'
-import { select } from '@inquirer/prompts'
+import select from '@inquirer/select'
 import { bold, green, red } from 'kleur/colors'
 import ora from 'ora'
 import { projectDependenciesHook } from '../hook'
