@@ -34,7 +34,7 @@ const registerInstallationHook = (template: string) => {
         title: template,
         value: template,
       })),
-      default: knownPackageManagerNames.indexOf(currentPackageManager),
+      default: currentPackageManager,
     })
 
     chdir(directoryPath)
