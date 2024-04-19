@@ -52,7 +52,7 @@ async function main() {
 
   const args = yargsParser(process.argv.slice(2))
 
-  const templateArg = args.template
+  const { install, pm, template: templateArg } = args
 
   const templates: Record<string, { name: string }> = {}
 
@@ -139,7 +139,7 @@ async function main() {
     })
   })
 
-  registerInstallationHook(templateName)
+  registerInstallationHook(templateName, install, pm)
 
   try {
     afterCreateHook.applyHook(templateName, {

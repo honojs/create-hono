@@ -18,24 +18,41 @@ const knownPackageManagers: { [key: string]: string } = {
 const knownPackageManagerNames = Object.keys(knownPackageManagers)
 const currentPackageManager = getCurrentPackageManager()
 
-const registerInstallationHook = (template: string) => {
+const registerInstallationHook = (
+  template: string,
+  installArg: boolean,
+  pmArg: string,
+) => {
   if (template == 'deno') return // Deno needs no dependency installation step
 
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
-    const installDeps = await confirm({
-      message: 'Do you want to install project dependencies?',
-      default: true,
-    })
+    let installDeps = false
+
+    if (installArg) {
+      installDeps = true
+    } else {
+      installDeps = await confirm({
+        message: 'Do you want to install project dependencies?',
+        default: true,
+      })
+    }
 
     if (!installDeps) return
-    const packageManager = await select({
-      message: 'Which package manager do you want to use?',
-      choices: knownPackageManagerNames.map((template: string) => ({
-        title: template,
-        value: template,
-      })),
-      default: currentPackageManager,
-    })
+
+    let packageManager
+
+    if (pmArg && knownPackageManagerNames.includes(pmArg)) {
+      packageManager = pmArg
+    } else {
+      packageManager = await select({
+        message: 'Which package manager do you want to use?',
+        choices: knownPackageManagerNames.map((template: string) => ({
+          title: template,
+          value: template,
+        })),
+        default: currentPackageManager,
+      })
+    }
 
     chdir(directoryPath)
 
