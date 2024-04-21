@@ -16,6 +16,22 @@ You can specify the desired template from the command line. This is useful for a
 npm create hono@latest ./my-app -- --template cloudflare-pages
 ```
 
+### `--install`
+
+Install dependencies after cloning template.
+
+```
+npm create hono@latest ./my-app -- --install
+```
+
+### `--pm <pnpm|bun|npm|yarn>`
+
+Allows you to specify which package manager to use.
+
+```
+npm create hono@latest ./my-app -- --pm pnpm
+```
+
 ## Author
 
 Yusuke Wada <https://github.com/yusukebe>
