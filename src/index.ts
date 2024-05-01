@@ -132,9 +132,7 @@ async function main() {
       },
     )
     emitter.clone(targetDirectoryPath).then(() => {
-      spinner.stop({
-        mark: chalk.green('✔'),
-      })
+      spinner.success()
       res({})
     })
   })

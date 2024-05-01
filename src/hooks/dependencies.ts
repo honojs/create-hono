@@ -68,9 +68,7 @@ const registerInstallationHook = (
     })
 
     if (procExit == 0) {
-      spinner.stop({
-        mark: chalk.green('✔'),
-      })
+      spinner.success()
     } else {
       spinner.stop({
         mark: chalk.red('×'),
