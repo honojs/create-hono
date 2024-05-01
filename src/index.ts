@@ -4,7 +4,7 @@ import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
 import chalk from 'chalk'
-import ora from 'ora'
+import { createSpinner } from 'nanospinner'
 // @ts-expect-error tiged does not have types
 import tiged from 'tiged'
 import yargsParser from 'yargs-parser'
@@ -121,7 +121,7 @@ async function main() {
   }
 
   const targetDirectoryPath = path.join(process.cwd(), target)
-  const spinner = ora('Cloning the template').start()
+  const spinner = createSpinner('Cloning the template').start()
 
   await new Promise((res) => {
     const emitter = tiged(
@@ -132,8 +132,8 @@ async function main() {
       },
     )
     emitter.clone(targetDirectoryPath).then(() => {
-      spinner.stopAndPersist({
-        symbol: chalk.green('✔'),
+      spinner.stop({
+        mark: chalk.green('✔'),
       })
       res({})
     })
