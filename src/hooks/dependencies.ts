@@ -3,7 +3,7 @@ import { chdir, exit } from 'process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import chalk from 'chalk'
-import ora from 'ora'
+import { createSpinner } from 'nanospinner'
 import { projectDependenciesHook } from '../hook'
 
 type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
@@ -60,21 +60,20 @@ const registerInstallationHook = (
       exit(1)
     }
 
-    const spinner = ora('Installing project dependencies').start()
+    const spinner = createSpinner('Installing project dependencies').start()
     const proc = exec(knownPackageManagers[packageManager])
 
     const procExit: number = await new Promise((res) => {
       proc.on('exit', (code) => res(code == null ? 0xff : code))
     })
 
-    spinner.stop().clear()
-
     if (procExit == 0) {
-      spinner.stopAndPersist({
-        symbol: chalk.green('✔'),
-      })
+      spinner.success()
     } else {
-      console.log(`${chalk.red('×')} Failed to install project dependencies`)
+      spinner.stop({
+        mark: chalk.red('×'),
+        text: 'Failed to install project dependencies',
+      })
       exit(procExit)
     }
 
