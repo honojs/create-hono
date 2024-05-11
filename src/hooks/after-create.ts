@@ -5,7 +5,7 @@ import { afterCreateHook } from '../hook'
 const PROJECT_NAME = new RegExp(/%%PROJECT_NAME.*%%/g)
 
 afterCreateHook.addHook(
-  ['cloudflare-workers', 'cloudflare-pages'],
+  ['cloudflare-workers', 'cloudflare-pages', 'x-basic'],
   ({ projectName, directoryPath }) => {
     const wranglerPath = path.join(directoryPath, 'wrangler.toml')
     const wrangler = readFileSync(wranglerPath, 'utf-8')
