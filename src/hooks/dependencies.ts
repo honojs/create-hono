@@ -30,7 +30,13 @@ const registerInstallationHook = (
 
     if (installArg) {
       installDeps = true
-    } else {
+    } 
+
+		if (installArg === false) {
+			installDeps = false
+    }
+
+		if (installArg === undefined) {
       installDeps = await confirm({
         message: 'Do you want to install project dependencies?',
         default: true,
