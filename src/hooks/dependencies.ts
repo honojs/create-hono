@@ -20,7 +20,7 @@ const currentPackageManager = getCurrentPackageManager()
 
 const registerInstallationHook = (
   template: string,
-  installArg: boolean,
+  installArg: boolean | undefined,
   pmArg: string,
 ) => {
   if (template == 'deno') return // Deno needs no dependency installation step
