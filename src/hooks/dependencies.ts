@@ -28,8 +28,8 @@ const registerInstallationHook = (
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
     let installDeps = false
 
-    if (installArg) {
-      installDeps = true
+    if (typeof installArg === 'boolean') {
+      installDeps = installArg
     } else {
       installDeps = await confirm({
         message: 'Do you want to install project dependencies?',
