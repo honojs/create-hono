@@ -3,6 +3,7 @@ import { chdir, exit } from 'process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import chalk from 'chalk'
+import { execa } from 'execa'
 import { createSpinner } from 'nanospinner'
 import { projectDependenciesHook } from '../hook'
 
@@ -102,13 +103,9 @@ function getCurrentPackageManager(): PackageManager {
 
 function checkPackageManagerInstalled(packageManager: string) {
   return new Promise<boolean>((resolve) => {
-    exec(`${packageManager} --version`, (error) => {
-      if (error) {
-        resolve(false)
-      } else {
-        resolve(true)
-      }
-    })
+    execa(packageManager, ['--version'])
+      .then(() => resolve(true))
+      .catch(() => resolve(false))
   })
 }
 
