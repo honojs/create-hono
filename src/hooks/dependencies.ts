@@ -18,12 +18,15 @@ const knownPackageManagers: { [key: string]: string } = {
 const knownPackageManagerNames = Object.keys(knownPackageManagers)
 const currentPackageManager = getCurrentPackageManager()
 
+// Deno and Netlify need no dependency installation step
+const excludeTemplate = ['deno', 'netlify']
+
 const registerInstallationHook = (
   template: string,
   installArg: boolean | undefined,
   pmArg: string,
 ) => {
-  if (template == 'deno') return // Deno needs no dependency installation step
+  if (excludeTemplate.includes(template)) return
 
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
     let installDeps = false
