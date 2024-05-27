@@ -42,14 +42,20 @@ const registerInstallationHook = (
 
     if (!installDeps) return
 
+    const installedPackageManagerNames = await Promise.all(
+      knownPackageManagerNames.map(checkPackageManagerInstalled),
+    ).then((results) =>
+      knownPackageManagerNames.filter((_, index) => results[index]),
+    )
+
     let packageManager
 
-    if (pmArg && knownPackageManagerNames.includes(pmArg)) {
+    if (pmArg && installedPackageManagerNames.includes(pmArg)) {
       packageManager = pmArg
     } else {
       packageManager = await select({
         message: 'Which package manager do you want to use?',
-        choices: knownPackageManagerNames.map((template: string) => ({
+        choices: installedPackageManagerNames.map((template: string) => ({
           title: template,
           value: template,
         })),
@@ -92,6 +98,18 @@ function getCurrentPackageManager(): PackageManager {
   else if (agent.startsWith('yarn')) return 'yarn'
 
   return 'npm'
+}
+
+function checkPackageManagerInstalled(packageManager: string) {
+  return new Promise<boolean>((resolve) => {
+    exec(`${packageManager} --version`, (error) => {
+      if (error) {
+        resolve(false)
+      } else {
+        resolve(true)
+      }
+    })
+  })
 }
 
 export { registerInstallationHook }
