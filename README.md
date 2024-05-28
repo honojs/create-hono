@@ -1,9 +1,41 @@
-# Create Hono
+<div align="center">
+  <img src="./images/hono-logo.png" width="148px" />
+  <h3>Create Hono</h3>
+  Create a Hono application from
+  <br />
+  starter templates in seconds!
 
-Create a Hono application from starter templates.
+  <br />
+  <br />
 
-```
+  <img width="720px" src="./images/screencast.svg" />
+</div>
+
+<br />
+
+---
+
+<br />
+
+## Quick Start
+
+Starter templates are available for each platform. Use one the following "create-hono" commands.
+
+```bash
+# npm
 npm create hono@latest
+
+# yarn
+yarn create hono
+
+# pnpm
+pnpm create hono@latest
+
+# bun
+bun create hono@latest
+
+# deno
+deno run -A npm:create-hono@latest
 ```
 
 ## Options
