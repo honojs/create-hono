@@ -1,19 +1,6 @@
-<div align="center">
-  <img src="./images/hono-logo.png" width="148px" />
-  <h3>Create Hono</h3>
-  Create a Hono application from
-  <br />
-  starter templates in seconds!
+# Create Hono
 
-  <br />
-  <br />
-
-  <img width="720px" src="./images/screencast.svg" />
-</div>
-
-<br />
-
-<br />
+Create a Hono application from starter templates.
 
 ## Quick Start
 
