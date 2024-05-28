@@ -109,4 +109,4 @@ function checkPackageManagerInstalled(packageManager: string) {
   })
 }
 
-export { registerInstallationHook }
+export { registerInstallationHook, checkPackageManagerInstalled }

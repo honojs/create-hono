@@ -5,6 +5,7 @@ import { cwd } from 'process'
 import { execa, execaSync } from 'execa'
 import type { ExecaChildProcess } from 'execa'
 import { afterAll, describe, expect, it } from 'vitest'
+import { checkPackageManagerInstalled } from './dependencies'
 
 let cmdBuffer = ''
 
@@ -15,6 +16,8 @@ const packageManagersCommands: { [key: string]: string[] } = {
   yarn: 'yarn run bin'.split(' '),
 }
 
+const knownPackageManagerNames: string[] = Object.keys(packageManagersCommands)
+
 const packageManagersLockfiles: { [key: string]: string } = {
   npm: 'package-lock.json',
   bun: 'bun.lockb',
@@ -22,21 +25,10 @@ const packageManagersLockfiles: { [key: string]: string } = {
   yarn: 'yarn.lock',
 }
 
-const availablePackageManagers = Object.keys(packageManagersCommands).filter(
-  (p) => {
-    if (p === 'npm') return true // Skip check for npm because it's most likely here and for some wierd reason, it returns an exitCode of 1 from `npm -h`
-
-    let stderr = ''
-
-    try {
-      const { stderr: err } = execaSync(p, ['-h'])
-      stderr = err
-    } catch (error) {
-      stderr = error as string
-    }
-
-    return stderr.length == 0
-  },
+const installedPackageManagerNames = await Promise.all(
+  knownPackageManagerNames.map(checkPackageManagerInstalled),
+).then((results: boolean[]) =>
+  knownPackageManagerNames.filter((_, index) => results[index]),
 )
 
 // Run build to have ./bin
@@ -49,7 +41,7 @@ describe('dependenciesHook', async () => {
     rmSync('bin') // Might be beneficial to remove the bin file
   })
 
-  describe.each(availablePackageManagers.map((p) => ({ pm: p })))(
+  describe.each(installedPackageManagerNames.map((p) => ({ pm: p })))(
     '$pm',
     ({ pm }) => {
       const proc = execa(
