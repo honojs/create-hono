@@ -2,8 +2,25 @@
 
 Create a Hono application from starter templates.
 
-```
+## Quick Start
+
+Starter templates are available for each platform. Use one the following "create-hono" commands.
+
+```bash
+# npm
 npm create hono@latest
+
+# yarn
+yarn create hono
+
+# pnpm
+pnpm create hono@latest
+
+# bun
+bun create hono@latest
+
+# deno
+deno run -A npm:create-hono@latest
 ```
 
 ## Options
