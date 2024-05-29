@@ -3,6 +3,7 @@ import { chdir, exit } from 'process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import chalk from 'chalk'
+import { execa } from 'execa'
 import { createSpinner } from 'nanospinner'
 import { projectDependenciesHook } from '../hook'
 
@@ -42,14 +43,20 @@ const registerInstallationHook = (
 
     if (!installDeps) return
 
+    const installedPackageManagerNames = await Promise.all(
+      knownPackageManagerNames.map(checkPackageManagerInstalled),
+    ).then((results) =>
+      knownPackageManagerNames.filter((_, index) => results[index]),
+    )
+
     let packageManager
 
-    if (pmArg && knownPackageManagerNames.includes(pmArg)) {
+    if (pmArg && installedPackageManagerNames.includes(pmArg)) {
       packageManager = pmArg
     } else {
       packageManager = await select({
         message: 'Which package manager do you want to use?',
-        choices: knownPackageManagerNames.map((template: string) => ({
+        choices: installedPackageManagerNames.map((template: string) => ({
           title: template,
           value: template,
         })),
@@ -94,4 +101,12 @@ function getCurrentPackageManager(): PackageManager {
   return 'npm'
 }
 
-export { registerInstallationHook }
+function checkPackageManagerInstalled(packageManager: string) {
+  return new Promise<boolean>((resolve) => {
+    execa(packageManager, ['--version'])
+      .then(() => resolve(true))
+      .catch(() => resolve(false))
+  })
+}
+
+export { registerInstallationHook, checkPackageManagerInstalled }
