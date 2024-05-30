@@ -21,19 +21,19 @@ const config = {
   ref: 'main',
 }
 
-const templateDirs = [
-  'templates/aws-lambda',
-  'templates/bun',
-  'templates/cloudflare-pages',
-  'templates/cloudflare-workers',
-  'templates/deno',
-  'templates/fastly',
-  'templates/lambda-edge',
-  'templates/netlify',
-  'templates/nextjs',
-  'templates/nodejs',
-  'templates/vercel',
-  'templates/x-basic',
+const templates = [
+  'aws-lambda',
+  'bun',
+  'cloudflare-pages',
+  'cloudflare-workers',
+  'deno',
+  'fastly',
+  'lambda-edge',
+  'netlify',
+  'nextjs',
+  'nodejs',
+  'vercel',
+  'x-basic',
 ]
 
 function mkdirp(dir: string) {
@@ -53,18 +53,6 @@ async function main() {
   const args = yargsParser(process.argv.slice(2))
 
   const { install, pm, template: templateArg } = args
-
-  const templates: Record<string, { name: string }> = {}
-
-  templateDirs.forEach((dir) => {
-    const template = dir.replace(`${directoryName}/`, '')
-    if (!templates[template]) {
-      templates[template] = {
-        name: template,
-      }
-    }
-  })
-  const templateNames = [...Object.values(templates)] as { name: string }[]
 
   let target = ''
   let projectName = ''
@@ -92,17 +80,18 @@ async function main() {
     (await select({
       loop: true,
       message: 'Which template do you want to use?',
-      choices: templateNames.map((template: { name: string }) => ({
-        title: template.name,
-        value: template.name,
+      choices: templates.map((template) => ({
+        title: template,
+        value: template,
       })),
       default: 0,
     }))
+
   if (!templateName) {
     throw new Error('No template selected')
   }
 
-  if (!templateNames.find((t) => t.name === templateName)) {
+  if (!templates.includes(templateName)) {
     throw new Error(`Invalid template selected: ${templateName}`)
   }
 
