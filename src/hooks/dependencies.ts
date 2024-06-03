@@ -32,6 +32,15 @@ const registerInstallationHook = (
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
     let installDeps = false
 
+    const installedPackageManagerNames = await Promise.all(
+      knownPackageManagerNames.map(checkPackageManagerInstalled),
+    ).then((results) =>
+      knownPackageManagerNames.filter((_, index) => results[index]),
+    )
+
+    // hide install dependencies option if no package manager is installed
+    if (!installedPackageManagerNames.length) return
+
     if (typeof installArg === 'boolean') {
       installDeps = installArg
     } else {
@@ -42,12 +51,6 @@ const registerInstallationHook = (
     }
 
     if (!installDeps) return
-
-    const installedPackageManagerNames = await Promise.all(
-      knownPackageManagerNames.map(checkPackageManagerInstalled),
-    ).then((results) =>
-      knownPackageManagerNames.filter((_, index) => results[index]),
-    )
 
     let packageManager
 
