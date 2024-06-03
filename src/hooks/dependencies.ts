@@ -39,7 +39,7 @@ const registerInstallationHook = (
     )
 
     // hide install dependencies option if no package manager is installed
-    if (installedPackageManagerNames.length) return
+    if (!installedPackageManagerNames.length) return
 
     if (typeof installArg === 'boolean') {
       installDeps = installArg
