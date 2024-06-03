@@ -38,14 +38,8 @@ const registerInstallationHook = (
       knownPackageManagerNames.filter((_, index) => results[index]),
     )
 
-    // show error message if no package manager is installed
-    if (!installedPackageManagerNames.length) {
-      console.log(
-        chalk.red('×'),
-        'No package manager found. Please install one any try again.',
-      )
-      return exit(1)
-    }
+    // hide install dependencies option if no package manager is installed
+    if (installedPackageManagerNames.length) return
 
     if (typeof installArg === 'boolean') {
       installDeps = installArg
