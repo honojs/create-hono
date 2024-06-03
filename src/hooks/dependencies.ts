@@ -32,6 +32,21 @@ const registerInstallationHook = (
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
     let installDeps = false
 
+    const installedPackageManagerNames = await Promise.all(
+      knownPackageManagerNames.map(checkPackageManagerInstalled),
+    ).then((results) =>
+      knownPackageManagerNames.filter((_, index) => results[index]),
+    )
+
+    // show error message if no package manager is installed
+    if (!installedPackageManagerNames.length) {
+      console.log(
+        chalk.red('×'),
+        'No package manager found. Please install one any try again.',
+      )
+      return exit(1)
+    }
+
     if (typeof installArg === 'boolean') {
       installDeps = installArg
     } else {
@@ -42,12 +57,6 @@ const registerInstallationHook = (
     }
 
     if (!installDeps) return
-
-    const installedPackageManagerNames = await Promise.all(
-      knownPackageManagerNames.map(checkPackageManagerInstalled),
-    ).then((results) =>
-      knownPackageManagerNames.filter((_, index) => results[index]),
-    )
 
     let packageManager
 
