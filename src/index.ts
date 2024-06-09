@@ -70,10 +70,8 @@ async function main() {
     target = answer
     if (answer === '.') {
       projectName = path.basename(process.cwd())
-      console.log('. ' + projectName)
     } else {
       projectName = path.basename(answer)
-      console.log('answer ' + projectName)
     }
   }
 
