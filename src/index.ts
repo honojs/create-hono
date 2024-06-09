@@ -70,8 +70,10 @@ async function main() {
     target = answer
     if (answer === '.') {
       projectName = path.basename(process.cwd())
+      console.log('. ' + projectName)
     } else {
       projectName = path.basename(answer)
+      console.log('answer ' + projectName)
     }
   }
 
@@ -146,6 +148,20 @@ async function main() {
       }`,
     )
   }
+  
+  const packageJsonPath = path.join(targetDirectoryPath, 'package.json')
+  const packageJson = fs.readFileSync(packageJsonPath, 'utf-8')
+
+  const packageJsonParsed = JSON.parse(packageJson)
+  const newPackageJson = {
+    name: projectName,
+    ...packageJsonParsed,
+  }
+
+  fs.writeFileSync(
+    packageJsonPath,
+    JSON.stringify(newPackageJson, null, 2),
+  )
 
   console.log(chalk.green('🎉 ' + chalk.bold('Copied project files')))
   console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
