@@ -156,10 +156,12 @@ async function main() {
     ...packageJsonParsed,
   }
 
-  fs.writeFileSync(
-    packageJsonPath,
-    JSON.stringify(newPackageJson, null, 2),
-  )
+  if (fs.existsSync(packageJsonPath)) {
+    fs.writeFileSync(
+      packageJsonPath,
+      JSON.stringify(newPackageJson, null, 2),
+    )
+  }
 
   console.log(chalk.green('🎉 ' + chalk.bold('Copied project files')))
   console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
