@@ -148,15 +148,16 @@ async function main() {
   }
   
   const packageJsonPath = path.join(targetDirectoryPath, 'package.json')
-  const packageJson = fs.readFileSync(packageJsonPath, 'utf-8')
-
-  const packageJsonParsed = JSON.parse(packageJson)
-  const newPackageJson = {
-    name: projectName,
-    ...packageJsonParsed,
-  }
-
+  
   if (fs.existsSync(packageJsonPath)) {
+    const packageJson = fs.readFileSync(packageJsonPath, 'utf-8')
+
+    const packageJsonParsed = JSON.parse(packageJson)
+    const newPackageJson = {
+      name: projectName,
+      ...packageJsonParsed,
+    }
+
     fs.writeFileSync(
       packageJsonPath,
       JSON.stringify(newPackageJson, null, 2),
