@@ -10,6 +10,7 @@ const b = () =>
     platform: 'node',
     outfile: 'bin',
     format: 'cjs',
+    minify: true,
   })
 
 Promise.all([b()])
