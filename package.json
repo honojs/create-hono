@@ -1,6 +1,6 @@
 {
   "name": "create-hono",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "scripts": {
     "build": "tsx ./build.ts",
     "bin": "./bin",
