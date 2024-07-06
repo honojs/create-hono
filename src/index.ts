@@ -55,24 +55,24 @@ async function main() {
   const { install, pm, template: templateArg } = args
 
   let target = ''
-  let projectName = ''
   if (args._[0]) {
     target = args._[0].toString()
     console.log(
       `${chalk.bold(`${chalk.green('✔')} Using target directory`)} … ${target}`,
     )
-    projectName = path.basename(target)
   } else {
     const answer = await input({
       message: 'Target directory',
       default: 'my-app',
     })
     target = answer
-    if (answer === '.') {
-      projectName = path.basename(process.cwd())
-    } else {
-      projectName = path.basename(answer)
-    }
+  }
+
+  let projectName = ''
+  if (target === '.') {
+    projectName = path.basename(process.cwd())
+  } else {
+    projectName = path.basename(target)
   }
 
   const templateName =
