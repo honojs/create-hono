@@ -9,6 +9,7 @@ describe('afterCreateHook', () => {
         vi.mock('fs', () => {
           const wrangler = `
 name = "%%PROJECT_NAME%%"
+compatibility_date = "2023-12-01"
 
 [env.staging]
 name = "%%PROJECT_NAME%%-staging"
@@ -24,18 +25,32 @@ name = "%%PROJECT_NAME%%-staging"
         const projectName = 'test-projectNAME+123'
         const directoryPath = './tmp'
         const wranglerPath = join(directoryPath, 'wrangler.toml')
-        const replaced = `
+
+        const firstHookContent = `
 name = "test-projectname-123"
+compatibility_date = "2023-12-01"
 
 [env.staging]
 name = "test-projectname-123-staging"
     `.trim()
+
+        // Get current date in YYYY-MM-DD format
+        const currentDate = new Date().toISOString().split('T')[0]
+        const secondHookContent = `
+name = "%%PROJECT_NAME%%"
+compatibility_date = "${currentDate}"
+
+[env.staging]
+name = "%%PROJECT_NAME%%-staging"
+    `.trim()
+
         afterCreateHook.applyHook('cloudflare-workers', {
           projectName,
           directoryPath,
         })
         expect(readFileSync).toHaveBeenCalledWith(wranglerPath, 'utf-8')
-        expect(writeFileSync).toHaveBeenCalledWith(wranglerPath, replaced)
+        expect(writeFileSync).nthCalledWith(1, wranglerPath, firstHookContent)
+        expect(writeFileSync).nthCalledWith(2, wranglerPath, secondHookContent)
       })
     })
   })
