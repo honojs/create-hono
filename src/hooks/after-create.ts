@@ -17,4 +17,19 @@ afterCreateHook.addHook(
   },
 )
 
+const regex = /compatibility_date\s*=\s*"\d{4}-\d{2}-\d{2}"/
+afterCreateHook.addHook(['cloudflare-workers'], ({ directoryPath }) => {
+  const wranglerPath = path.join(directoryPath, 'wrangler.toml')
+  const wrangler = readFileSync(wranglerPath, 'utf-8')
+
+  const currentDate = new Date().toISOString().split('T')[0] // Get current date in YYYY-MM-DD format
+
+  const rewritten = wrangler.replace(
+    regex,
+    `compatibility_date = "${currentDate}"`,
+  )
+
+  writeFileSync(wranglerPath, rewritten)
+})
+
 export { afterCreateHook }
