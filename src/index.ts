@@ -112,7 +112,7 @@ async function main() {
   const spinner = createSpinner('Cloning the template').start()
 
   await downloadTemplate(
-    `${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
+    `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
     {
       dir: targetDirectoryPath,
       offline: false,
