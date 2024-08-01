@@ -155,7 +155,7 @@ async function main() {
     fs.writeFileSync(packageJsonPath, JSON.stringify(newPackageJson, null, 2))
   }
 
-  console.log(chalk.green('🎉 ' + chalk.bold('Copied project files')))
+  console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
   console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
 }
 
