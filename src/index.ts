@@ -4,9 +4,8 @@ import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
 import chalk from 'chalk'
+import { downloadTemplate } from 'giget'
 import { createSpinner } from 'nanospinner'
-// @ts-expect-error tiged does not have types
-import tiged from 'tiged'
 import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
@@ -19,7 +18,7 @@ const config = {
   repository: 'starter',
   user: 'honojs',
   ref: 'main',
-}
+} as const
 
 const templates = [
   'aws-lambda',
@@ -112,19 +111,14 @@ async function main() {
   const targetDirectoryPath = path.join(process.cwd(), target)
   const spinner = createSpinner('Cloning the template').start()
 
-  await new Promise((res) => {
-    const emitter = tiged(
-      `${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
-      {
-        cache: false,
-        force: true,
-      },
-    )
-    emitter.clone(targetDirectoryPath).then(() => {
-      spinner.success()
-      res({})
-    })
-  })
+  await downloadTemplate(
+    `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
+    {
+      dir: targetDirectoryPath,
+      offline: false,
+      force: true,
+    },
+  ).then(() => spinner.success())
 
   registerInstallationHook(templateName, install, pm)
 
@@ -161,7 +155,7 @@ async function main() {
     fs.writeFileSync(packageJsonPath, JSON.stringify(newPackageJson, null, 2))
   }
 
-  console.log(chalk.green('🎉 ' + chalk.bold('Copied project files')))
+  console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
   console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
 }
 
