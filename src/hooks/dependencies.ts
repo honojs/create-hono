@@ -16,7 +16,7 @@ const knownPackageManagers: { [key: string]: string } = {
   yarn: 'yarn',
 }
 
-const knownPackageManagerNames = Object.keys(knownPackageManagers)
+export const knownPackageManagerNames = Object.keys(knownPackageManagers)
 const currentPackageManager = getCurrentPackageManager()
 
 // Deno and Netlify need no dependency installation step

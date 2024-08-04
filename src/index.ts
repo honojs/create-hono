@@ -4,13 +4,16 @@ import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
 import chalk from 'chalk'
+import { Option, program, type Command } from 'commander'
 import { downloadTemplate } from 'giget'
 import { createSpinner } from 'nanospinner'
-import yargsParser from 'yargs-parser'
 import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
-import { registerInstallationHook } from './hooks/dependencies'
+import {
+  knownPackageManagerNames,
+  registerInstallationHook,
+} from './hooks/dependencies'
 
 const directoryName = 'templates'
 const config = {
@@ -46,16 +49,49 @@ function mkdirp(dir: string) {
   }
 }
 
-async function main() {
-  console.log(chalk.gray(`create-hono version ${version}`))
+program
+  .name('create-hono')
+  .version(version)
+  .arguments('[target]')
+  .addOption(
+    new Option('-y, --install', 'Install dependencies').argParser(Boolean),
+  )
+  .addOption(
+    new Option('-p, --pm <pm>', 'Package manager to use').choices(
+      knownPackageManagerNames,
+    ),
+  )
+  .addOption(
+    new Option('-t, --template <template>', 'Template to use').choices(
+      templates,
+    ),
+  )
+  .addOption(
+    new Option('--offline', 'Use offline mode')
+      .argParser(Boolean)
+      .default(false),
+  )
+  .action(main)
 
-  const args = yargsParser(process.argv.slice(2))
+type ArgOptions = {
+  install: boolean
+  offline: boolean
+  pm: string
+  template: string
+}
 
-  const { install, pm, template: templateArg } = args
+async function main(
+  targetDir: string | undefined,
+  options: ArgOptions,
+  command: Command,
+) {
+  console.log(chalk.gray(`${command.name()} version ${command.version()}`))
+
+  const { install, pm, offline, template: templateArg } = options
 
   let target = ''
-  if (args._[0]) {
-    target = args._[0].toString()
+  if (targetDir) {
+    target = targetDir
     console.log(
       `${chalk.bold(`${chalk.green('✔')} Using target directory`)} … ${target}`,
     )
@@ -115,7 +151,7 @@ async function main() {
     `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
     {
       dir: targetDirectoryPath,
-      offline: false,
+      offline,
       force: true,
     },
   ).then(() => spinner.success())
@@ -159,4 +195,4 @@ async function main() {
   console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
 }
 
-main()
+program.parse()
