@@ -54,7 +54,7 @@ program
   .version(version)
   .arguments('[target]')
   .addOption(
-    new Option('-y, --install', 'Install dependencies').argParser(Boolean),
+    new Option('-i, --install', 'Install dependencies').argParser(Boolean),
   )
   .addOption(
     new Option('-p, --pm <pm>', 'Package manager to use').choices(
@@ -67,7 +67,7 @@ program
     ),
   )
   .addOption(
-    new Option('--offline', 'Use offline mode')
+    new Option('-o, --offline', 'Use offline mode')
       .argParser(Boolean)
       .default(false),
   )
