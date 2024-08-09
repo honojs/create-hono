@@ -25,7 +25,7 @@ deno run -A npm:create-hono@latest
 
 ## Options
 
-### `--template`
+### `-t, --template <template>`
 
 You can specify the desired template from the command line. This is useful for automation, where you'd like to skip any interactive prompts.
 
@@ -33,7 +33,7 @@ You can specify the desired template from the command line. This is useful for a
 npm create hono@latest ./my-app -- --template cloudflare-pages
 ```
 
-### `--install`
+### `-i, --install`
 
 Install dependencies after cloning template.
 
@@ -41,12 +41,20 @@ Install dependencies after cloning template.
 npm create hono@latest ./my-app -- --install
 ```
 
-### `--pm <pnpm|bun|npm|yarn>`
+### `-p, --pm <pnpm|bun|npm|yarn>`
 
 Allows you to specify which package manager to use.
 
 ```
 npm create hono@latest ./my-app -- --pm pnpm
+```
+
+### `-o, --offline`
+
+Use the local cache instead of fetching the latest templates.
+
+```
+npm create hono@latest ./my-app -- --offline
 ```
 
 ## Author
