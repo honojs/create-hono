@@ -27,6 +27,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
+    "@clack/core": "^0.3.4",
     "@hono/eslint-config": "^0.0.2",
     "@inquirer/confirm": "^3.1.0",
     "@inquirer/input": "^2.1.0",
@@ -42,6 +43,7 @@
     "nanospinner": "^1.1.0",
     "np": "^7.6.3",
     "prettier": "^3.3.3",
+    "sisteransi": "^1.0.5",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3",
     "vitest": "^0.34.6"
