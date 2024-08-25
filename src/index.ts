@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
@@ -62,9 +62,7 @@ program
     ),
   )
   .addOption(
-    new Option('-t, --template <template>', 'Template to use').choices(
-      templates,
-    ),
+    new Option('-t, --template <template>', 'Template to use either one '),
   )
   .addOption(
     new Option('-o, --offline', 'Use offline mode')
@@ -126,10 +124,6 @@ async function main(
     throw new Error('No template selected')
   }
 
-  if (!templates.includes(templateName)) {
-    throw new Error(`Invalid template selected: ${templateName}`)
-  }
-
   if (fs.existsSync(target)) {
     if (fs.readdirSync(target).length > 0) {
       const response = await confirm({
@@ -147,14 +141,25 @@ async function main(
   const targetDirectoryPath = path.join(process.cwd(), target)
   const spinner = createSpinner('Cloning the template').start()
 
-  await downloadTemplate(
-    `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
-    {
-      dir: targetDirectoryPath,
-      offline,
-      force: true,
-    },
-  ).then(() => spinner.success())
+  let repo: string
+  const isExternalTemplate = !templates.includes(templateName)
+
+  if (isExternalTemplate) {
+    console.log(
+      chalk.bgYellow.black(' Warning '),
+      chalk.yellow(
+        'You are downloading an external template. Please review the template before running it.',
+      ),
+    )
+    repo = templateName
+  } else
+    repo = `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`
+
+  await downloadTemplate(repo, {
+    dir: targetDirectoryPath,
+    offline,
+    force: true,
+  }).then(() => spinner.success())
 
   registerInstallationHook(templateName, install, pm)
 
