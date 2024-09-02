@@ -145,30 +145,39 @@ async function main(
   }
 
   const targetDirectoryPath = path.join(process.cwd(), target)
-  const spinner = createSpinner('Cloning the template').start()
 
-  await downloadTemplate(
-    `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
-    {
-      dir: targetDirectoryPath,
-      offline,
-      force: true,
-    },
-  ).then(() => spinner.success())
+  const controllers = {
+    dependencies: new AbortController(),
+    completed: new AbortController(),
+  }
 
-  registerInstallationHook(templateName, install, pm)
+  registerInstallationHook(templateName, install, pm, controllers)
 
   try {
-    afterCreateHook.applyHook(templateName, {
-      projectName,
-      directoryPath: targetDirectoryPath,
-    })
-
     await Promise.all(
       projectDependenciesHook.applyHook(templateName, {
         directoryPath: targetDirectoryPath,
       }),
     )
+
+    const spinner = createSpinner('Cloning the template').start()
+
+    await downloadTemplate(
+      `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
+      {
+        dir: targetDirectoryPath,
+        offline,
+        force: true,
+      },
+    ).then(() => {
+      spinner.success()
+      controllers.dependencies.abort()
+    })
+
+    afterCreateHook.applyHook(templateName, {
+      projectName,
+      directoryPath: targetDirectoryPath,
+    })
   } catch (e) {
     throw new Error(
       `Error running hook for ${templateName}: ${
@@ -191,8 +200,10 @@ async function main(
     fs.writeFileSync(packageJsonPath, JSON.stringify(newPackageJson, null, 2))
   }
 
-  console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
-  console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
+  controllers.completed.signal.addEventListener('abort', () => {
+    console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
+    console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
+  })
 }
 
 program.parse()
