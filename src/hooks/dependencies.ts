@@ -23,7 +23,7 @@ const currentPackageManager = getCurrentPackageManager()
 // Deno and Netlify need no dependency installation step
 const excludeTemplate = ['deno', 'netlify']
 
-export type EventMap = { dependencies: any[]; completed: any[] }
+export type EventMap = { dependencies: unknown[]; completed: unknown[] }
 
 const registerInstallationHook = (
   template: string,
