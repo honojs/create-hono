@@ -1,3 +1,4 @@
+import EventEmitter from 'events'
 import fs from 'fs'
 import path from 'path'
 import confirm from '@inquirer/confirm'
@@ -11,6 +12,7 @@ import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
 import {
+  type EventMap,
   knownPackageManagerNames,
   registerInstallationHook,
 } from './hooks/dependencies'
@@ -146,12 +148,9 @@ async function main(
 
   const targetDirectoryPath = path.join(process.cwd(), target)
 
-  const controllers = {
-    dependencies: new AbortController(),
-    completed: new AbortController(),
-  }
+  const emitter = new EventEmitter<EventMap>()
 
-  registerInstallationHook(templateName, install, pm, controllers)
+  registerInstallationHook(templateName, install, pm, emitter)
 
   try {
     await Promise.all(
@@ -171,7 +170,7 @@ async function main(
       },
     ).then(() => {
       spinner.success()
-      controllers.dependencies.abort()
+      emitter.emit('dependencies')
     })
 
     afterCreateHook.applyHook(templateName, {
@@ -200,7 +199,7 @@ async function main(
     fs.writeFileSync(packageJsonPath, JSON.stringify(newPackageJson, null, 2))
   }
 
-  controllers.completed.signal.addEventListener('abort', () => {
+  emitter.on('completed', () => {
     console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
     console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
   })

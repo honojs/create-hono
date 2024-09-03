@@ -1,4 +1,5 @@
 import { exec } from 'child_process'
+import type { EventEmitter } from 'events'
 import { chdir, exit } from 'process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
@@ -22,11 +23,13 @@ const currentPackageManager = getCurrentPackageManager()
 // Deno and Netlify need no dependency installation step
 const excludeTemplate = ['deno', 'netlify']
 
+export type EventMap = { dependencies: any[]; completed: any[] }
+
 const registerInstallationHook = (
   template: string,
   installArg: boolean | undefined,
   pmArg: string,
-  controllers: { dependencies: AbortController; completed: AbortController },
+  emitter: EventEmitter<EventMap>,
 ) => {
   if (excludeTemplate.includes(template)) return
 
@@ -68,7 +71,7 @@ const registerInstallationHook = (
       })
     }
 
-    controllers.dependencies.signal.addEventListener('abort', async () => {
+    emitter.on('dependencies', async () => {
       chdir(directoryPath)
 
       if (!knownPackageManagers[packageManager]) {
@@ -92,7 +95,7 @@ const registerInstallationHook = (
         exit(procExit)
       }
 
-      controllers.completed.abort()
+      emitter.emit('completed')
     })
 
     return
