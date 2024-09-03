@@ -1,3 +1,4 @@
+import EventEmitter from 'events'
 import fs from 'fs'
 import path from 'path'
 import confirm from '@inquirer/confirm'
@@ -11,6 +12,7 @@ import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
 import {
+  type EventMap,
   knownPackageManagerNames,
   registerInstallationHook,
 } from './hooks/dependencies'
@@ -145,30 +147,36 @@ async function main(
   }
 
   const targetDirectoryPath = path.join(process.cwd(), target)
-  const spinner = createSpinner('Cloning the template').start()
 
-  await downloadTemplate(
-    `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
-    {
-      dir: targetDirectoryPath,
-      offline,
-      force: true,
-    },
-  ).then(() => spinner.success())
+  const emitter = new EventEmitter<EventMap>()
 
-  registerInstallationHook(templateName, install, pm)
+  registerInstallationHook(templateName, install, pm, emitter)
 
   try {
-    afterCreateHook.applyHook(templateName, {
-      projectName,
-      directoryPath: targetDirectoryPath,
-    })
-
     await Promise.all(
       projectDependenciesHook.applyHook(templateName, {
         directoryPath: targetDirectoryPath,
       }),
     )
+
+    const spinner = createSpinner('Cloning the template').start()
+
+    await downloadTemplate(
+      `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
+      {
+        dir: targetDirectoryPath,
+        offline,
+        force: true,
+      },
+    ).then(() => {
+      spinner.success()
+      emitter.emit('dependencies')
+    })
+
+    afterCreateHook.applyHook(templateName, {
+      projectName,
+      directoryPath: targetDirectoryPath,
+    })
   } catch (e) {
     throw new Error(
       `Error running hook for ${templateName}: ${
@@ -191,8 +199,10 @@ async function main(
     fs.writeFileSync(packageJsonPath, JSON.stringify(newPackageJson, null, 2))
   }
 
-  console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
-  console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
+  emitter.on('completed', () => {
+    console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
+    console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
+  })
 }
 
 program.parse()

@@ -1,4 +1,5 @@
 import { exec } from 'child_process'
+import type { EventEmitter } from 'events'
 import { chdir, exit } from 'process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
@@ -22,10 +23,13 @@ const currentPackageManager = getCurrentPackageManager()
 // Deno and Netlify need no dependency installation step
 const excludeTemplate = ['deno', 'netlify']
 
+export type EventMap = { dependencies: unknown[]; completed: unknown[] }
+
 const registerInstallationHook = (
   template: string,
   installArg: boolean | undefined,
   pmArg: string,
+  emitter: EventEmitter<EventMap>,
 ) => {
   if (excludeTemplate.includes(template)) return
 
@@ -67,28 +71,32 @@ const registerInstallationHook = (
       })
     }
 
-    chdir(directoryPath)
+    emitter.on('dependencies', async () => {
+      chdir(directoryPath)
 
-    if (!knownPackageManagers[packageManager]) {
-      exit(1)
-    }
+      if (!knownPackageManagers[packageManager]) {
+        exit(1)
+      }
 
-    const spinner = createSpinner('Installing project dependencies').start()
-    const proc = exec(knownPackageManagers[packageManager])
+      const spinner = createSpinner('Installing project dependencies').start()
+      const proc = exec(knownPackageManagers[packageManager])
 
-    const procExit: number = await new Promise((res) => {
-      proc.on('exit', (code) => res(code == null ? 0xff : code))
-    })
-
-    if (procExit == 0) {
-      spinner.success()
-    } else {
-      spinner.stop({
-        mark: chalk.red('×'),
-        text: 'Failed to install project dependencies',
+      const procExit: number = await new Promise((res) => {
+        proc.on('exit', (code) => res(code == null ? 0xff : code))
       })
-      exit(procExit)
-    }
+
+      if (procExit == 0) {
+        spinner.success()
+      } else {
+        spinner.stop({
+          mark: chalk.red('×'),
+          text: 'Failed to install project dependencies',
+        })
+        exit(procExit)
+      }
+
+      emitter.emit('completed')
+    })
 
     return
   })
