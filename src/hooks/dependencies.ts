@@ -1,6 +1,6 @@
-import { exec } from 'child_process'
-import type { EventEmitter } from 'events'
-import { chdir, exit } from 'process'
+import { exec } from 'node:child_process'
+import type { EventEmitter } from 'node:events'
+import { chdir, exit } from 'node:process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import chalk from 'chalk'
@@ -56,7 +56,7 @@ const registerInstallationHook = (
 
     if (!installDeps) return
 
-    let packageManager
+    let packageManager: string
 
     if (pmArg && installedPackageManagerNames.includes(pmArg)) {
       packageManager = pmArg
@@ -85,7 +85,7 @@ const registerInstallationHook = (
         proc.on('exit', (code) => res(code == null ? 0xff : code))
       })
 
-      if (procExit == 0) {
+      if (procExit === 0) {
         spinner.success()
       } else {
         spinner.stop({
@@ -106,8 +106,8 @@ function getCurrentPackageManager(): PackageManager {
   const agent = process.env.npm_config_user_agent || 'npm' // Types say it might be undefined, just being cautious;
 
   if (agent.startsWith('bun')) return 'bun'
-  else if (agent.startsWith('pnpm')) return 'pnpm'
-  else if (agent.startsWith('yarn')) return 'yarn'
+  if (agent.startsWith('pnpm')) return 'pnpm'
+  if (agent.startsWith('yarn')) return 'yarn'
 
   return 'npm'
 }
