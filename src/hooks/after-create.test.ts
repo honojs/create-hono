@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { afterCreateHook } from './after-create'
 
@@ -20,7 +20,7 @@ name = "%%PROJECT_NAME%%-staging"
             writeFileSync: vi.fn(),
           }
         })
-        const { readFileSync, writeFileSync } = await import('fs')
+        const { readFileSync, writeFileSync } = await import('node:fs')
 
         const projectName = 'test-projectNAME+123'
         const directoryPath = './tmp'

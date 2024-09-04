@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync } from 'fs'
-import * as path from 'path'
+import { readFileSync, writeFileSync } from 'node:fs'
+import * as path from 'node:path'
 import { afterCreateHook } from '../hook'
 
 const PROJECT_NAME = new RegExp(/%%PROJECT_NAME.*%%/g)

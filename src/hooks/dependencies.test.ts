@@ -1,7 +1,6 @@
-import { Buffer } from 'buffer'
-
-import { existsSync, rmSync } from 'fs'
-import { cwd } from 'process'
+import { Buffer } from 'node:buffer'
+import { existsSync, rmSync } from 'node:fs'
+import { cwd } from 'node:process'
 import { execa, execaSync } from 'execa'
 import type { ExecaChildProcess } from 'execa'
 import { afterAll, describe, expect, it } from 'vitest'
@@ -54,7 +53,7 @@ describe('dependenciesHook', async () => {
           env: { ...process.env, npm_config_user_agent: pm },
         },
       )
-      const targetDirectory = 'test-dir/' + generateRandomAlphanumericString(8)
+      const targetDirectory = `test-dir/${generateRandomAlphanumericString(8)}`
 
       afterAll(() => {
         rmSync(targetDirectory, { recursive: true, force: true })
@@ -108,28 +107,23 @@ describe('dependenciesHook', async () => {
       })
 
       it('should have installed dependencies', async () => {
-        while (!existsSync(targetDirectory + '/node_modules'))
+        while (!existsSync(`${targetDirectory}/node_modules`))
           await timeout(5_000) // 3 seconds;
 
         expect(
-          existsSync(targetDirectory + '/node_modules'),
+          existsSync(`${targetDirectory}/node_modules`),
           'node_modules directory exists',
         )
       })
 
-      it(
-        'should have package manager specific lock file (' +
-          packageManagersLockfiles[pm] +
-          ')',
-        async () => {
-          expect(
-            existsSync(targetDirectory + '/' + packageManagersLockfiles[pm]),
-            'lockfile exists',
-          )
+      it(`should have package manager specific lock file (${packageManagersLockfiles[pm]})`, async () => {
+        expect(
+          existsSync(`${targetDirectory}/${packageManagersLockfiles[pm]}`),
+          'lockfile exists',
+        )
 
-          cmdBuffer = ''
-        },
-      )
+        cmdBuffer = ''
+      })
     },
     { timeout: 60_000 },
   )
@@ -188,6 +182,6 @@ const writeResponse = (
   else process.stdin?.write(Buffer.from(response))
 }
 
-export const answerWithValue = (value = '') => [value, CONFIRM].flat()
+const answerWithValue = (value = '') => [value, CONFIRM].flat()
 
-export const CONFIRM = '\n'
+const CONFIRM = '\n'
