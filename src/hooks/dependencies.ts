@@ -1,5 +1,6 @@
-import { exec } from 'child_process'
-import { chdir, exit } from 'process'
+import { exec } from 'node:child_process'
+import type { EventEmitter } from 'node:events'
+import { chdir, exit } from 'node:process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import chalk from 'chalk'
@@ -22,10 +23,13 @@ const currentPackageManager = getCurrentPackageManager()
 // Deno and Netlify need no dependency installation step
 const excludeTemplate = ['deno', 'netlify']
 
+export type EventMap = { dependencies: unknown[]; completed: unknown[] }
+
 const registerInstallationHook = (
   template: string,
   installArg: boolean | undefined,
   pmArg: string,
+  emitter: EventEmitter<EventMap>,
 ) => {
   if (excludeTemplate.includes(template)) return
 
@@ -52,7 +56,7 @@ const registerInstallationHook = (
 
     if (!installDeps) return
 
-    let packageManager
+    let packageManager: string
 
     if (pmArg && installedPackageManagerNames.includes(pmArg)) {
       packageManager = pmArg
@@ -67,28 +71,32 @@ const registerInstallationHook = (
       })
     }
 
-    chdir(directoryPath)
+    emitter.on('dependencies', async () => {
+      chdir(directoryPath)
 
-    if (!knownPackageManagers[packageManager]) {
-      exit(1)
-    }
+      if (!knownPackageManagers[packageManager]) {
+        exit(1)
+      }
 
-    const spinner = createSpinner('Installing project dependencies').start()
-    const proc = exec(knownPackageManagers[packageManager])
+      const spinner = createSpinner('Installing project dependencies').start()
+      const proc = exec(knownPackageManagers[packageManager])
 
-    const procExit: number = await new Promise((res) => {
-      proc.on('exit', (code) => res(code == null ? 0xff : code))
-    })
-
-    if (procExit == 0) {
-      spinner.success()
-    } else {
-      spinner.stop({
-        mark: chalk.red('×'),
-        text: 'Failed to install project dependencies',
+      const procExit: number = await new Promise((res) => {
+        proc.on('exit', (code) => res(code == null ? 0xff : code))
       })
-      exit(procExit)
-    }
+
+      if (procExit === 0) {
+        spinner.success()
+      } else {
+        spinner.stop({
+          mark: chalk.red('×'),
+          text: 'Failed to install project dependencies',
+        })
+        exit(procExit)
+      }
+
+      emitter.emit('completed')
+    })
 
     return
   })
@@ -98,8 +106,8 @@ function getCurrentPackageManager(): PackageManager {
   const agent = process.env.npm_config_user_agent || 'npm' // Types say it might be undefined, just being cautious;
 
   if (agent.startsWith('bun')) return 'bun'
-  else if (agent.startsWith('pnpm')) return 'pnpm'
-  else if (agent.startsWith('yarn')) return 'yarn'
+  if (agent.startsWith('pnpm')) return 'pnpm'
+  if (agent.startsWith('yarn')) return 'yarn'
 
   return 'npm'
 }
