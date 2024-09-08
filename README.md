@@ -69,3 +69,5 @@ MIT
 
 This project source code is based on **Create Solid** MIT Licensed.
 <https://github.com/solidjs/solid-start/tree/main/packages/create-solid>
+
+`./src/prompts.ts` is based on [`@clack/prompts`](https://github.com/bombshell-dev/clack/tree/45ee73b/packages/prompts) MIT Licensed.

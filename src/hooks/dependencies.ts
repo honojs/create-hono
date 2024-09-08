@@ -1,12 +1,10 @@
 import { exec } from 'node:child_process'
 import type { EventEmitter } from 'node:events'
 import { chdir, exit } from 'node:process'
-import confirm from '@inquirer/confirm'
-import select from '@inquirer/select'
 import { execa } from 'execa'
-import { createSpinner } from 'nanospinner'
 import color from 'picocolors'
 import { projectDependenciesHook } from '../hook'
+import { confirm, select, spinner } from '../prompts'
 
 type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
 
@@ -50,7 +48,7 @@ const registerInstallationHook = (
     } else {
       installDeps = await confirm({
         message: 'Do you want to install project dependencies?',
-        default: true,
+        initialValue: true,
       })
     }
 
@@ -63,11 +61,10 @@ const registerInstallationHook = (
     } else {
       packageManager = await select({
         message: 'Which package manager do you want to use?',
-        choices: installedPackageManagerNames.map((template: string) => ({
-          title: template,
+        options: installedPackageManagerNames.map((template: string) => ({
           value: template,
         })),
-        default: currentPackageManager,
+        initialValue: currentPackageManager,
       })
     }
 
@@ -78,7 +75,8 @@ const registerInstallationHook = (
         exit(1)
       }
 
-      const spinner = createSpinner('Installing project dependencies').start()
+      const s = spinner()
+      s.start('Installing project dependencies')
       const proc = exec(knownPackageManagers[packageManager])
 
       const procExit: number = await new Promise((res) => {
@@ -86,12 +84,9 @@ const registerInstallationHook = (
       })
 
       if (procExit === 0) {
-        spinner.success()
+        s.stop('Installed successfully.')
       } else {
-        spinner.stop({
-          mark: color.red('×'),
-          text: 'Failed to install project dependencies',
-        })
+        s.stop(`${color.red('×')} Failed to install project dependencies`)
         exit(procExit)
       }
 

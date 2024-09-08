@@ -1,12 +1,8 @@
 import EventEmitter from 'node:events'
 import fs from 'node:fs'
 import path from 'node:path'
-import confirm from '@inquirer/confirm'
-import input from '@inquirer/input'
-import select from '@inquirer/select'
 import { Option, program, type Command } from 'commander'
 import { downloadTemplate } from 'giget'
-import { createSpinner } from 'nanospinner'
 import color from 'picocolors'
 import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
@@ -16,6 +12,7 @@ import {
   knownPackageManagerNames,
   registerInstallationHook,
 } from './hooks/dependencies'
+import { confirm, select, spinner, text } from './prompts'
 
 const directoryName = 'templates'
 const config = {
@@ -98,9 +95,10 @@ async function main(
       `${color.bold(`${color.green('✔')} Using target directory`)} … ${target}`,
     )
   } else {
-    const answer = await input({
+    const answer = await text({
       message: 'Target directory',
-      default: 'my-app',
+      placeholder: 'my-app',
+      defaultValue: 'my-app',
     })
     target = answer
   }
@@ -115,13 +113,10 @@ async function main(
   const templateName =
     templateArg ||
     (await select({
-      loop: true,
       message: 'Which template do you want to use?',
-      choices: templates.map((template) => ({
-        title: template,
+      options: templates.map((template) => ({
         value: template,
       })),
-      default: 0,
     }))
 
   if (!templateName) {
@@ -136,7 +131,7 @@ async function main(
     if (fs.readdirSync(target).length > 0) {
       const response = await confirm({
         message: 'Directory not empty. Continue?',
-        default: false,
+        initialValue: false,
       })
       if (!response) {
         process.exit(1)
@@ -159,7 +154,8 @@ async function main(
       }),
     )
 
-    const spinner = createSpinner('Cloning the template').start()
+    const s = spinner()
+    s.start('Cloning the template')
 
     await downloadTemplate(
       `gh:${config.user}/${config.repository}/${config.directory}/${templateName}#${config.ref}`,
@@ -169,7 +165,7 @@ async function main(
         force: true,
       },
     ).then(() => {
-      spinner.success()
+      s.stop('Cloned.')
       emitter.emit('dependencies')
     })
 

@@ -29,9 +29,6 @@
   "devDependencies": {
     "@clack/core": "^0.3.4",
     "@hono/eslint-config": "^0.0.2",
-    "@inquirer/confirm": "^3.1.0",
-    "@inquirer/input": "^2.1.0",
-    "@inquirer/select": "^2.2.0",
     "@types/node": "^18.11.18",
     "@types/yargs-parser": "^21.0.0",
     "commander": "^12.1.0",
@@ -39,7 +36,7 @@
     "eslint": "^8.55.0",
     "execa": "^8.0.1",
     "giget": "^1.2.3",
-    "nanospinner": "^1.1.0",
+    "is-unicode-supported": "^2.0.0",
     "np": "^7.6.3",
     "picocolors": "^1.1.0",
     "prettier": "^3.3.3",
