@@ -4,10 +4,10 @@ import path from 'node:path'
 import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
-import chalk from 'chalk'
 import { Option, program, type Command } from 'commander'
 import { downloadTemplate } from 'giget'
 import { createSpinner } from 'nanospinner'
+import color from 'picocolors'
 import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
@@ -87,7 +87,7 @@ async function main(
   options: ArgOptions,
   command: Command,
 ) {
-  console.log(chalk.gray(`${command.name()} version ${command.version()}`))
+  console.log(color.gray(`${command.name()} version ${command.version()}`))
 
   const { install, pm, offline, template: templateArg } = options
 
@@ -95,7 +95,7 @@ async function main(
   if (targetDir) {
     target = targetDir
     console.log(
-      `${chalk.bold(`${chalk.green('✔')} Using target directory`)} … ${target}`,
+      `${color.bold(`${color.green('✔')} Using target directory`)} … ${target}`,
     )
   } else {
     const answer = await input({
@@ -200,8 +200,8 @@ async function main(
   }
 
   emitter.on('completed', () => {
-    console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
-    console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
+    console.log(color.green(`🎉 ${color.bold('Copied project files')}`))
+    console.log(color.gray('Get started with:'), color.bold(`cd ${target}`))
   })
 }
 

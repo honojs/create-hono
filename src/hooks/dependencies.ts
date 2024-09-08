@@ -3,9 +3,9 @@ import type { EventEmitter } from 'node:events'
 import { chdir, exit } from 'node:process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
-import chalk from 'chalk'
 import { execa } from 'execa'
 import { createSpinner } from 'nanospinner'
+import color from 'picocolors'
 import { projectDependenciesHook } from '../hook'
 
 type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
@@ -89,7 +89,7 @@ const registerInstallationHook = (
         spinner.success()
       } else {
         spinner.stop({
-          mark: chalk.red('×'),
+          mark: color.red('×'),
           text: 'Failed to install project dependencies',
         })
         exit(procExit)
