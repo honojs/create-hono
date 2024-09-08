@@ -2,7 +2,6 @@ import { exec } from 'node:child_process'
 import type { EventEmitter } from 'node:events'
 import { chdir, exit } from 'node:process'
 import { execa } from 'execa'
-import color from 'picocolors'
 import { projectDependenciesHook } from '../hook'
 import { confirm, select, spinner } from '../prompts'
 
@@ -78,7 +77,6 @@ const registerInstallationHook = (
       const s = spinner()
       s.start('Installing project dependencies')
       const proc = exec(knownPackageManagers[packageManager])
-
       const procExit: number = await new Promise((res) => {
         proc.on('exit', (code) => res(code == null ? 0xff : code))
       })
@@ -86,7 +84,7 @@ const registerInstallationHook = (
       if (procExit === 0) {
         s.stop('Installed successfully.')
       } else {
-        s.stop(`${color.red('×')} Failed to install project dependencies`)
+        s.stop('Failed to install project dependencies', 1)
         exit(procExit)
       }
 

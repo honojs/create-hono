@@ -1,4 +1,3 @@
-import type { State } from '@clack/core'
 import {
   block,
   ConfirmPrompt,
@@ -12,38 +11,22 @@ import { cursor, erase } from 'sisteransi'
 
 const unicode = isUnicodeSupported()
 const s = (c: string, fallback: string) => (unicode ? c : fallback)
-const S_STEP_ACTIVE = s('◆', '*')
-const S_STEP_CANCEL = s('■', 'x')
-const S_STEP_ERROR = s('▲', 'x')
-const S_STEP_SUBMIT = s('◇', 'o')
 
-const S_BAR = s('│', '|')
-const S_BAR_END = s('└', '—')
+const S_STEP = color.green('?')
 
 const S_RADIO_ACTIVE = s('●', '>')
 const S_RADIO_INACTIVE = s('○', ' ')
 
-const symbol = (state: State) => {
-  switch (state) {
-    case 'initial':
-    case 'active':
-      return color.cyan(S_STEP_ACTIVE)
-    case 'cancel':
-      return color.red(S_STEP_CANCEL)
-    case 'error':
-      return color.yellow(S_STEP_ERROR)
-    case 'submit':
-      return color.green(S_STEP_SUBMIT)
-  }
-}
+const S_SUCCESS = s('✔', 'o')
+const S_CANCEL = s('✖', 'x')
+const S_ERROR = s('⚠️', '!')
 
 function onCancel() {
-  console.log('\nOperation canceled.')
+  console.log(color.red(`\n${S_CANCEL} Operation canceled.`))
 }
 
 interface LimitOptionsParams<TOption> {
   options: TOption[]
-  maxItems: number | undefined
   cursor: number
   style: (option: TOption, active: boolean) => string
 }
@@ -53,10 +36,7 @@ const limitOptions = <TOption>(
 ): string[] => {
   const { cursor, options, style } = params
 
-  const paramMaxItems = params.maxItems ?? Infinity
-  const outputMaxItems = Math.max(process.stdout.rows - 4, 0)
-  // We clamp to minimum 5 because anything less doesn't make sense UX wise
-  const maxItems = Math.min(outputMaxItems, Math.max(paramMaxItems, 5))
+  const maxItems = 7
   let slidingWindowLocation = 0
 
   if (cursor >= slidingWindowLocation + maxItems - 3) {
@@ -99,7 +79,7 @@ export const text = (opts: TextOptions) => {
     defaultValue: opts.defaultValue,
     initialValue: opts.initialValue,
     render() {
-      const title = `${color.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n`
+      const title = `${S_STEP} ${opts.message}`
       const placeholder = opts.placeholder
         ? color.inverse(opts.placeholder[0]) +
           color.dim(opts.placeholder.slice(1))
@@ -108,17 +88,13 @@ export const text = (opts: TextOptions) => {
 
       switch (this.state) {
         case 'error':
-          return `${title.trim()}\n${color.yellow(S_BAR)}  ${value}\n${color.yellow(
-            S_BAR_END,
-          )}  ${color.yellow(this.error)}\n`
+          return `${title.trim()} ${value}\n${color.yellow(this.error)}`
         case 'submit':
-          return `${title}${color.gray(S_BAR)}  ${color.dim(this.value || opts.placeholder)}`
+          return `${title} ${color.dim(this.value || opts.placeholder)}`
         case 'cancel':
-          return `${title}${color.gray(S_BAR)}  ${color.strikethrough(
-            color.dim(this.value ?? ''),
-          )}${this.value?.trim() ? '\n' + color.gray(S_BAR) : ''}`
+          return `${title} ${color.gray(color.strikethrough(this.value ?? ''))}`
         default:
-          return `${title}${color.cyan(S_BAR)}  ${value}\n${color.cyan(S_BAR_END)}\n`
+          return `${title} ${value}`
       }
     },
   })
@@ -146,18 +122,16 @@ export const confirm = (opts: ConfirmOptions) => {
     inactive,
     initialValue: opts.initialValue ?? true,
     render() {
-      const title = `${color.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n`
+      const title = `${S_STEP} ${opts.message}`
       const value = this.value ? active : inactive
 
       switch (this.state) {
         case 'submit':
-          return `${title}${color.gray(S_BAR)}  ${color.dim(value)}`
+          return `${title} ${color.dim(value)}`
         case 'cancel':
-          return `${title}${color.gray(S_BAR)}  ${color.strikethrough(
-            color.dim(value),
-          )}\n${color.gray(S_BAR)}`
+          return `${title} ${color.strikethrough(color.dim(value))}`
         default: {
-          return `${title}${color.cyan(S_BAR)}  ${
+          return `${title} ${
             this.value
               ? `${color.green(S_RADIO_ACTIVE)} ${active}`
               : `${color.dim(S_RADIO_INACTIVE)} ${color.dim(active)}`
@@ -165,7 +139,7 @@ export const confirm = (opts: ConfirmOptions) => {
             !this.value
               ? `${color.green(S_RADIO_ACTIVE)} ${inactive}`
               : `${color.dim(S_RADIO_INACTIVE)} ${color.dim(inactive)}`
-          }\n${color.cyan(S_BAR_END)}\n`
+          }`
         }
       }
     },
@@ -190,7 +164,6 @@ interface SelectOptions<Value> {
   message: string
   options: Option<Value>[]
   initialValue?: Value
-  maxItems?: number
 }
 
 export const select = <Value>(opts: SelectOptions<Value>) => {
@@ -217,23 +190,19 @@ export const select = <Value>(opts: SelectOptions<Value>) => {
     options: opts.options,
     initialValue: opts.initialValue,
     render() {
-      const title = `${color.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n`
+      const title = `${S_STEP} ${opts.message}`
 
       switch (this.state) {
         case 'submit':
-          return `${title}${color.gray(S_BAR)}  ${opt(this.options[this.cursor], 'selected')}`
+          return `${title} ${opt(this.options[this.cursor], 'selected')}`
         case 'cancel':
-          return `${title}${color.gray(S_BAR)}  ${opt(
-            this.options[this.cursor],
-            'cancelled',
-          )}\n${color.gray(S_BAR)}`
+          return `${title} ${opt(this.options[this.cursor], 'cancelled')}`
         default: {
-          return `${title}${color.cyan(S_BAR)}  ${limitOptions({
+          return `${title}\n${limitOptions({
             cursor: this.cursor,
             options: this.options,
-            maxItems: opts.maxItems,
             style: (item, active) => opt(item, active ? 'active' : 'inactive'),
-          }).join(`\n${color.cyan(S_BAR)}  `)}\n${color.cyan(S_BAR_END)}\n`
+          }).join('\n')}`
         }
       }
     },
@@ -259,7 +228,8 @@ export const spinner = () => {
 
   const handleExit = (code: number) => {
     const msg = code > 1 ? 'Something went wrong' : 'Canceled'
-    if (isSpinnerActive) stop(msg, code)
+    // Due to commander, there may be cancellations with a `0` code.
+    if (isSpinnerActive) stop(msg, code !== 0 ? code : 1)
   }
 
   const errorEventHandler = () => handleExit(2)
@@ -288,7 +258,6 @@ export const spinner = () => {
     isSpinnerActive = true
     unblock = block()
     _message = msg.replace(/\.+$/, '')
-    process.stdout.write(`${color.gray(S_BAR)}\n`)
     let frameIndex = 0
     let dotsTimer = 0
     registerHooks()
@@ -309,10 +278,10 @@ export const spinner = () => {
     clearInterval(loop)
     const step =
       code === 0
-        ? color.green(S_STEP_SUBMIT)
+        ? color.green(S_SUCCESS)
         : code === 1
-          ? color.red(S_STEP_CANCEL)
-          : color.red(S_STEP_ERROR)
+          ? color.red(S_CANCEL)
+          : color.red(S_ERROR)
     process.stdout.write(cursor.move(-999, 0))
     process.stdout.write(erase.down(1))
     process.stdout.write(`${step}  ${_message}\n`)
