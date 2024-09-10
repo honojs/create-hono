@@ -106,7 +106,7 @@ async function main(
   }
 
   let projectName = ''
-  if (target === '.') {
+  if (['.', './'].includes(target)) {
     projectName = path.basename(process.cwd())
   } else {
     projectName = path.basename(target)
