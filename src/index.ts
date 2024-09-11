@@ -17,6 +17,7 @@ import {
   registerInstallationHook,
 } from './hooks/dependencies'
 
+const isCurrentDirRegex = /^(\.\/|\.\\|\.)$/
 const directoryName = 'templates'
 const config = {
   directory: directoryName,
@@ -106,7 +107,7 @@ async function main(
   }
 
   let projectName = ''
-  if (['.', './'].includes(target)) {
+  if (isCurrentDirRegex.test(target)) {
     projectName = path.basename(process.cwd())
   } else {
     projectName = path.basename(target)
