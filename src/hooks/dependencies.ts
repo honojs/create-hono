@@ -45,7 +45,7 @@ const registerInstallationHook = (
 
     // hide install dependencies option if no package manager is installed
     if (!installedPackageManagerNames.length) return
-    // If Deno is installed, it will not be displayed because there is no 'deno install' in version 1.
+    // If version 1 of Deno is installed, it will not be suggested because it doesn't have "deno install".
     if (installedPackageManagerNames.includes('deno')) {
       const { stdout } = await execa('deno', ['-v'])
       if (stdout.split(' ')[1].split('.')[0] == '1') {
