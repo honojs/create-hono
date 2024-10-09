@@ -41,7 +41,7 @@ Install dependencies after cloning template.
 npm create hono@latest ./my-app -- --install
 ```
 
-### `-p, --pm <pnpm|bun|npm|yarn>`
+### `-p, --pm <pnpm|bun|deno|npm|yarn>`
 
 Allows you to specify which package manager to use.
 
