@@ -8,11 +8,12 @@ import { execa } from 'execa'
 import { createSpinner } from 'nanospinner'
 import { projectDependenciesHook } from '../hook'
 
-type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
+type PackageManager = 'npm' | 'bun' | 'deno' | 'pnpm' | 'yarn'
 
 const knownPackageManagers: { [key: string]: string } = {
   npm: 'npm install',
   bun: 'bun install',
+  deno: 'deno install',
   pnpm: 'pnpm install',
   yarn: 'yarn',
 }
@@ -44,6 +45,16 @@ const registerInstallationHook = (
 
     // hide install dependencies option if no package manager is installed
     if (!installedPackageManagerNames.length) return
+    // If Deno is installed, it will not be displayed because there is no 'deno install' in version 1.
+    if (installedPackageManagerNames.includes('deno')) {
+      const { stdout } = await execa('deno', ['-v'])
+      if (stdout.split(' ')[1].split('.')[0] == '1') {
+        installedPackageManagerNames.splice(
+          installedPackageManagerNames.indexOf('deno'),
+          1,
+        )
+      }
+    }
 
     if (typeof installArg === 'boolean') {
       installDeps = installArg
