@@ -8,11 +8,12 @@ import { execa } from 'execa'
 import { createSpinner } from 'nanospinner'
 import { projectDependenciesHook } from '../hook'
 
-type PackageManager = 'npm' | 'bun' | 'pnpm' | 'yarn'
+type PackageManager = 'npm' | 'bun' | 'deno' | 'pnpm' | 'yarn'
 
 const knownPackageManagers: { [key: string]: string } = {
   npm: 'npm install',
   bun: 'bun install',
+  deno: 'deno install',
   pnpm: 'pnpm install',
   yarn: 'yarn',
 }
@@ -44,6 +45,16 @@ const registerInstallationHook = (
 
     // hide install dependencies option if no package manager is installed
     if (!installedPackageManagerNames.length) return
+    // If version 1 of Deno is installed, it will not be suggested because it doesn't have "deno install".
+    if (installedPackageManagerNames.includes('deno')) {
+      const { stdout } = await execa('deno', ['-v'])
+      if (stdout.split(' ')[1].split('.')[0] == '1') {
+        installedPackageManagerNames.splice(
+          installedPackageManagerNames.indexOf('deno'),
+          1,
+        )
+      }
+    }
 
     if (typeof installArg === 'boolean') {
       installDeps = installArg
@@ -106,6 +117,7 @@ function getCurrentPackageManager(): PackageManager {
   const agent = process.env.npm_config_user_agent || 'npm' // Types say it might be undefined, just being cautious;
 
   if (agent.startsWith('bun')) return 'bun'
+  if (agent.startsWith('deno')) return 'deno'
   if (agent.startsWith('pnpm')) return 'pnpm'
   if (agent.startsWith('yarn')) return 'yarn'
 
