@@ -49,7 +49,7 @@ const registerInstallationHook = (
     if (installedPackageManagerNames.includes('deno')) {
       let isVersion1 = false
       try {
-        const { stdout } = await execa('deno', ['-V'])
+        const { stdout } = await execa('deno', ['-v'])
         isVersion1 = stdout.split(' ')[1].split('.')[0] == '1'
       } catch {
         isVersion1 = true
