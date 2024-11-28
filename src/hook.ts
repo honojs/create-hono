@@ -37,6 +37,7 @@ export class Hook<HookFunction extends HookSignature> {
 type AfterHookOptions = {
   projectName: string
   directoryPath: string
+  packageManager: string
 }
 
 type AfterHookFunction = (options: AfterHookOptions) => void
