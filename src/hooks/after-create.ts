@@ -3,31 +3,29 @@ import * as path from 'node:path'
 import { afterCreateHook } from '../hook'
 
 const PROJECT_NAME = new RegExp(/%%PROJECT_NAME.*%%/g)
-const PACKAGE_MANAGER = new RegExp(/\$npm_execpath/g)
 
 afterCreateHook.addHook(
   ['cloudflare-workers', 'cloudflare-pages', 'x-basic'],
-  ({ projectName, packageManager, directoryPath }) => {
-    // Read the wrangler.toml file
+  ({ projectName, directoryPath }) => {
     const wranglerPath = path.join(directoryPath, 'wrangler.toml')
     const wrangler = readFileSync(wranglerPath, 'utf-8')
     const convertProjectName = projectName
       .toLowerCase()
       .replaceAll(/[^a-z0-9\-_]/gm, '-')
-    const rewrittenWranglerFile = wrangler.replaceAll(
-      PROJECT_NAME,
-      convertProjectName,
-    )
-    writeFileSync(wranglerPath, rewrittenWranglerFile)
+    const rewritten = wrangler.replaceAll(PROJECT_NAME, convertProjectName)
+    writeFileSync(wranglerPath, rewritten)
+  },
+)
 
-    // Read the package.json file
+const PACKAGE_MANAGER = new RegExp(/\$npm_execpath/g)
+
+afterCreateHook.addHook(
+  ['cloudflare-pages', 'x-basic'],
+  ({ packageManager, directoryPath }) => {
     const packageJsonPath = path.join(directoryPath, 'package.json')
     const packageJson = readFileSync(packageJsonPath, 'utf-8')
-    const rewrittenPackageJsonFile = packageJson.replaceAll(
-      PACKAGE_MANAGER,
-      packageManager,
-    )
-    writeFileSync(packageJsonPath, rewrittenPackageJsonFile)
+    const rewritten = packageJson.replaceAll(PACKAGE_MANAGER, packageManager)
+    writeFileSync(packageJsonPath, rewritten)
   },
 )
 
