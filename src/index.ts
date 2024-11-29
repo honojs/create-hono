@@ -152,7 +152,7 @@ async function main(
   const emitter = new EventEmitter<EventMap>()
 
   // Default package manager
-  let packageManager = 'npm'
+  let packageManager = pm ?? 'npm'
   emitter.addListener('packageManager', (pm) => {
     packageManager = String(pm)
   })
