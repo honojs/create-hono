@@ -151,6 +151,12 @@ async function main(
 
   const emitter = new EventEmitter<EventMap>()
 
+  // Default package manager
+  let packageManager = pm ?? 'npm'
+  emitter.addListener('packageManager', (pm) => {
+    packageManager = String(pm)
+  })
+
   registerInstallationHook(templateName, install, pm, emitter)
 
   try {
@@ -169,14 +175,15 @@ async function main(
         offline,
         force: true,
       },
-    ).then(() => {
-      spinner.success()
-      emitter.emit('dependencies')
-    })
+    )
+
+    spinner.success()
+    emitter.emit('dependencies')
 
     afterCreateHook.applyHook(templateName, {
       projectName,
       directoryPath: targetDirectoryPath,
+      packageManager,
     })
   } catch (e) {
     throw new Error(

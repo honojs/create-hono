@@ -24,7 +24,11 @@ const currentPackageManager = getCurrentPackageManager()
 // Deno and Netlify need no dependency installation step
 const excludeTemplate = ['deno', 'netlify']
 
-export type EventMap = { dependencies: unknown[]; completed: unknown[] }
+export type EventMap = {
+  dependencies: unknown[]
+  packageManager: unknown[]
+  completed: unknown[]
+}
 
 const registerInstallationHook = (
   template: string,
@@ -50,7 +54,7 @@ const registerInstallationHook = (
       let isVersion1 = false
       try {
         const { stdout } = await execa('deno', ['-v'])
-        isVersion1 = stdout.split(' ')[1].split('.')[0] == '1'
+        isVersion1 = stdout.split(' ')[1].split('.')[0] === '1'
       } catch {
         isVersion1 = true
       }
@@ -87,6 +91,8 @@ const registerInstallationHook = (
         default: currentPackageManager,
       })
     }
+
+    emitter.emit('packageManager', packageManager)
 
     emitter.on('dependencies', async () => {
       chdir(directoryPath)

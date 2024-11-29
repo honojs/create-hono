@@ -17,6 +17,18 @@ afterCreateHook.addHook(
   },
 )
 
+const PACKAGE_MANAGER = new RegExp(/\$npm_execpath/g)
+
+afterCreateHook.addHook(
+  ['cloudflare-pages', 'x-basic'],
+  ({ packageManager, directoryPath }) => {
+    const packageJsonPath = path.join(directoryPath, 'package.json')
+    const packageJson = readFileSync(packageJsonPath, 'utf-8')
+    const rewritten = packageJson.replaceAll(PACKAGE_MANAGER, packageManager)
+    writeFileSync(packageJsonPath, rewritten)
+  },
+)
+
 const COMPATIBILITY_DATE = /compatibility_date\s*=\s*"\d{4}-\d{2}-\d{2}"/
 afterCreateHook.addHook(
   ['cloudflare-workers', 'cloudflare-pages'],

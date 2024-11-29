@@ -25,6 +25,7 @@ name = "%%PROJECT_NAME%%-staging"
         const projectName = 'test-projectNAME+123'
         const directoryPath = './tmp'
         const wranglerPath = join(directoryPath, 'wrangler.toml')
+        const packageManager = 'npm'
 
         const firstHookContent = `
 name = "test-projectname-123"
@@ -47,6 +48,7 @@ name = "%%PROJECT_NAME%%-staging"
         afterCreateHook.applyHook('cloudflare-workers', {
           projectName,
           directoryPath,
+          packageManager,
         })
         expect(readFileSync).toHaveBeenCalledWith(wranglerPath, 'utf-8')
         expect(writeFileSync).nthCalledWith(1, wranglerPath, firstHookContent)
