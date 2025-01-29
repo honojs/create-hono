@@ -10,13 +10,15 @@ afterCreateHook.addHook(
   ['cloudflare-workers', 'cloudflare-pages', 'x-basic'],
   ({ projectName, directoryPath }) => {
     for (const filename in WRANGLER_FILES) {
-      const wranglerPath = path.join(directoryPath, filename)
-      const wrangler = readFileSync(wranglerPath, 'utf-8')
-      const convertProjectName = projectName
-        .toLowerCase()
-        .replaceAll(/[^a-z0-9\-_]/gm, '-')
-      const rewritten = wrangler.replaceAll(PROJECT_NAME, convertProjectName)
-      writeFileSync(wranglerPath, rewritten)
+      try {
+        const wranglerPath = path.join(directoryPath, filename)
+        const wrangler = readFileSync(wranglerPath, 'utf-8')
+        const convertProjectName = projectName
+          .toLowerCase()
+          .replaceAll(/[^a-z0-9\-_]/gm, '-')
+        const rewritten = wrangler.replaceAll(PROJECT_NAME, convertProjectName)
+        writeFileSync(wranglerPath, rewritten)
+      } catch {}
     }
   },
 )
@@ -38,15 +40,17 @@ afterCreateHook.addHook(
   ['cloudflare-workers', 'cloudflare-pages'],
   ({ directoryPath }) => {
     for (const filename in WRANGLER_FILES) {
-      const wranglerPath = path.join(directoryPath, filename)
-      const wrangler = readFileSync(wranglerPath, 'utf-8')
-      // Get current date in YYYY-MM-DD format
-      const currentDate = new Date().toISOString().split('T')[0]
-      const rewritten = wrangler.replace(
-        COMPATIBILITY_DATE,
-        `compatibility_date = "${currentDate}"`,
-      )
-      writeFileSync(wranglerPath, rewritten)
+      try {
+        const wranglerPath = path.join(directoryPath, filename)
+        const wrangler = readFileSync(wranglerPath, 'utf-8')
+        // Get current date in YYYY-MM-DD format
+        const currentDate = new Date().toISOString().split('T')[0]
+        const rewritten = wrangler.replace(
+          COMPATIBILITY_DATE,
+          `compatibility_date = "${currentDate}"`,
+        )
+        writeFileSync(wranglerPath, rewritten)
+      } catch {}
     }
   },
 )
