@@ -52,7 +52,7 @@ name = "%%PROJECT_NAME%%-staging"
         })
         expect(readFileSync).toHaveBeenCalledWith(wranglerPath, 'utf-8')
         expect(writeFileSync).nthCalledWith(1, wranglerPath, firstHookContent)
-        expect(writeFileSync).nthCalledWith(2, wranglerPath, secondHookContent)
+        expect(writeFileSync).nthCalledWith(4, wranglerPath, secondHookContent)
       })
     })
   })

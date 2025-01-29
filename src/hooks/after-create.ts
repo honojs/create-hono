@@ -9,7 +9,7 @@ const WRANGLER_FILES = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc']
 afterCreateHook.addHook(
   ['cloudflare-workers', 'cloudflare-pages', 'x-basic'],
   ({ projectName, directoryPath }) => {
-    for (const filename in WRANGLER_FILES) {
+    for (const filename of WRANGLER_FILES) {
       try {
         const wranglerPath = path.join(directoryPath, filename)
         const wrangler = readFileSync(wranglerPath, 'utf-8')
@@ -39,7 +39,7 @@ const COMPATIBILITY_DATE = /compatibility_date\s*=\s*"\d{4}-\d{2}-\d{2}"/
 afterCreateHook.addHook(
   ['cloudflare-workers', 'cloudflare-pages'],
   ({ directoryPath }) => {
-    for (const filename in WRANGLER_FILES) {
+    for (const filename of WRANGLER_FILES) {
       try {
         const wranglerPath = path.join(directoryPath, filename)
         const wrangler = readFileSync(wranglerPath, 'utf-8')
