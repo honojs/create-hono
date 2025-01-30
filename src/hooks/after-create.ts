@@ -38,7 +38,7 @@ afterCreateHook.addHook(
 const COMPATIBILITY_DATE_TOML = /compatibility_date\s*=\s*"\d{4}-\d{2}-\d{2}"/
 const COMPATIBILITY_DATE_JSON = /"compatibility_date"\s*:\s*"\d{4}-\d{2}-\d{2}"/
 afterCreateHook.addHook(
-  ['cloudflare-workers', 'cloudflare-pages'],
+  ['cloudflare-workers', 'cloudflare-pages', 'x-basic'],
   ({ directoryPath }) => {
     for (const filename of WRANGLER_FILES) {
       try {
