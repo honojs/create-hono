@@ -5,7 +5,7 @@
     "build": "tsx ./build.ts",
     "bin": "./bin",
     "test": "vitest --run",
-    "prepack": "yarn build",
+    "prepack": "bun run build",
     "release": "np",
     "lint": "eslint --ext js,ts src",
     "lint:fix": "eslint --ext js,ts src --fix",
