@@ -17,13 +17,16 @@ import {
   registerInstallationHook,
 } from './hooks/dependencies'
 
+const [major, minor] = version.split('.')
+const ref = `v${major}.${minor}`
+
 const isCurrentDirRegex = /^(\.\/|\.\\|\.)$/
 const directoryName = 'templates'
 const config = {
   directory: directoryName,
   repository: 'starter',
   user: 'honojs',
-  ref: 'main',
+  ref,
 } as const
 
 const templates = [

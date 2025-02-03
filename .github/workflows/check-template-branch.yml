@@ -1,0 +1,41 @@
+name: Check Template Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check_template_branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get create-hono version
+        id: get_version
+        run: |
+          VERSION=$(jq -r .version package.json)
+          MAJOR_MINOR=$(echo "$VERSION" | cut -d '.' -f 1,2)
+          echo "Detected version: $VERSION"
+          echo "Branch to check: v$MAJOR_MINOR"
+          echo "branch_name=v$MAJOR_MINOR" >> "$GITHUB_ENV"
+
+      - name: Check if branch exists in template repository
+        id: check_branch
+        run: |
+          TEMPLATE_REPO="honojs/starter"
+          BRANCH_NAME=${{ env.branch_name }}
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://api.github.com/repos/$TEMPLATE_REPO/git/refs/heads/$BRANCH_NAME")
+
+          if [ "$RESPONSE" -ne 200 ]; then
+            echo "Error: Branch '$BRANCH_NAME' does not exist in $TEMPLATE_REPO"
+            exit 1
+          fi
+
+      - name: Notify branch exists
+        if: success()
+        run: |
+          echo "Branch ${{ env.branch_name }} exists in the template repository."
