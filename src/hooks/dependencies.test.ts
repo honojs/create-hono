@@ -19,7 +19,7 @@ const knownPackageManagerNames: string[] = Object.keys(packageManagersCommands)
 
 const packageManagersLockfiles: { [key: string]: string } = {
   npm: 'package-lock.json',
-  bun: 'bun.lockb',
+  bun: 'bun.lock',
   pnpm: 'pnpm-lock.yml',
   yarn: 'yarn.lock',
 }
