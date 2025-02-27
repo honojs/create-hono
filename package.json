@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "create-hono",
   "version": "0.15.3",
   "scripts": {
