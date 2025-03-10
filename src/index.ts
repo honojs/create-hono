@@ -160,7 +160,7 @@ async function main(
     packageManager = String(pm)
   })
 
-  registerInstallationHook(templateName, install, packageManager, emitter)
+  registerInstallationHook(templateName, install, pm, emitter)
 
   try {
     await Promise.all(
