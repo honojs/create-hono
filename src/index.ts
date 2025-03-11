@@ -80,10 +80,10 @@ program
   .action(main)
 
 type ArgOptions = {
-  install: boolean
+  pm?: string
   offline: boolean
-  pm: string
-  template: string
+  install?: boolean
+  template?: string
 }
 
 async function main(
