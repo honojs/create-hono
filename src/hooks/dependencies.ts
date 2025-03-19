@@ -33,7 +33,7 @@ export type EventMap = {
 const registerInstallationHook = (
   template: string,
   installArg: boolean | undefined,
-  pmArg: string,
+  pmArg: string | undefined,
   emitter: EventEmitter<EventMap>,
 ) => {
   if (excludeTemplate.includes(template)) return
