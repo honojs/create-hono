@@ -59,9 +59,7 @@ program
   .name('create-hono')
   .version(version)
   .arguments('[target]')
-  .addOption(
-    new Option('-i, --install', 'Install dependencies').argParser(Boolean),
-  )
+  .addOption(new Option('-i, --install', 'Install dependencies'))
   .addOption(
     new Option('-p, --pm <pm>', 'Package manager to use').choices(
       knownPackageManagerNames,
@@ -72,11 +70,7 @@ program
       templates,
     ),
   )
-  .addOption(
-    new Option('-o, --offline', 'Use offline mode')
-      .argParser(Boolean)
-      .default(false),
-  )
+  .addOption(new Option('-o, --offline', 'Use offline mode').default(false))
   .action(main)
 
 type ArgOptions = {
