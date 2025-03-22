@@ -1,11 +1,11 @@
-import { exec } from 'node:child_process'
-import type { EventEmitter } from 'node:events'
-import { chdir, exit } from 'node:process'
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
 import chalk from 'chalk'
 import { execa } from 'execa'
 import { createSpinner } from 'nanospinner'
+import { exec } from 'node:child_process'
+import type { EventEmitter } from 'node:events'
+import { chdir, exit } from 'node:process'
 import { projectDependenciesHook } from '../hook'
 
 type PackageManager = 'npm' | 'bun' | 'deno' | 'pnpm' | 'yarn'
@@ -36,7 +36,9 @@ const registerInstallationHook = (
   pmArg: string | undefined,
   emitter: EventEmitter<EventMap>,
 ) => {
-  if (excludeTemplate.includes(template)) return
+  if (excludeTemplate.includes(template)) {
+    return
+  }
 
   projectDependenciesHook.addHook(template, async ({ directoryPath }) => {
     let installDeps = false
@@ -48,7 +50,9 @@ const registerInstallationHook = (
     )
 
     // hide install dependencies option if no package manager is installed
-    if (!installedPackageManagerNames.length) return
+    if (!installedPackageManagerNames.length) {
+      return
+    }
     // If version 1 of Deno is installed, it will not be suggested because it doesn't have "deno install".
     if (installedPackageManagerNames.includes('deno')) {
       let isVersion1 = false
@@ -75,7 +79,9 @@ const registerInstallationHook = (
       })
     }
 
-    if (!installDeps) return
+    if (!installDeps) {
+      return
+    }
 
     let packageManager: string
 
@@ -128,10 +134,18 @@ const registerInstallationHook = (
 function getCurrentPackageManager(): PackageManager {
   const agent = process.env.npm_config_user_agent || 'npm' // Types say it might be undefined, just being cautious;
 
-  if (agent.startsWith('bun')) return 'bun'
-  if (agent.startsWith('deno')) return 'deno'
-  if (agent.startsWith('pnpm')) return 'pnpm'
-  if (agent.startsWith('yarn')) return 'yarn'
+  if (agent.startsWith('bun')) {
+    return 'bun'
+  }
+  if (agent.startsWith('deno')) {
+    return 'deno'
+  }
+  if (agent.startsWith('pnpm')) {
+    return 'pnpm'
+  }
+  if (agent.startsWith('yarn')) {
+    return 'yarn'
+  }
 
   return 'npm'
 }
