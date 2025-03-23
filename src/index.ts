@@ -1,21 +1,22 @@
-import EventEmitter from 'node:events'
-import fs from 'node:fs'
-import path from 'node:path'
 import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
 import chalk from 'chalk'
-import { Option, program, type Command } from 'commander'
+import { Option, program } from 'commander'
+import type { Command } from 'commander'
 import { downloadTemplate } from 'giget'
 import { createSpinner } from 'nanospinner'
+import EventEmitter from 'node:events'
+import fs from 'node:fs'
+import path from 'node:path'
 import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
 import {
-  type EventMap,
   knownPackageManagerNames,
   registerInstallationHook,
 } from './hooks/dependencies'
+import type { EventMap } from './hooks/dependencies'
 
 const [major, minor] = version.split('.')
 const ref = `v${major}.${minor}`
@@ -49,7 +50,9 @@ function mkdirp(dir: string) {
     fs.mkdirSync(dir, { recursive: true })
   } catch (e) {
     if (e instanceof Error) {
-      if ('code' in e && e.code === 'EEXIST') return
+      if ('code' in e && e.code === 'EEXIST') {
+        return
+      }
     }
     throw e
   }
@@ -137,6 +140,7 @@ async function main(
         default: false,
       })
       if (!response) {
+        // eslint-disable-next-line n/no-process-exit
         process.exit(1)
       }
     }
@@ -207,6 +211,7 @@ async function main(
   emitter.on('completed', () => {
     console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
     console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
+    // eslint-disable-next-line n/no-process-exit
     process.exit(0)
   })
 }
