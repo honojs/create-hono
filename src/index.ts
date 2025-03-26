@@ -33,8 +33,8 @@ const config = {
 const templates = [
   'aws-lambda',
   'bun',
-  'cloudflare-pages',
   'cloudflare-workers',
+  'cloudflare-workers+vite',
   'deno',
   'fastly',
   'lambda-edge',
@@ -42,6 +42,7 @@ const templates = [
   'nextjs',
   'nodejs',
   'vercel',
+  'cloudflare-pages',
   'x-basic',
 ]
 
