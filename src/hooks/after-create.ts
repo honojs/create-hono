@@ -7,7 +7,12 @@ const PROJECT_NAME = new RegExp(/%%PROJECT_NAME.*%%/g)
 const WRANGLER_FILES = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc']
 
 afterCreateHook.addHook(
-  ['cloudflare-workers', 'cloudflare-pages', 'x-basic'],
+  [
+    'cloudflare-workers',
+    'cloudflare-workers+vite',
+    'cloudflare-pages',
+    'x-basic',
+  ],
   ({ projectName, directoryPath }) => {
     for (const filename of WRANGLER_FILES) {
       try {
