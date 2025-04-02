@@ -31,7 +31,7 @@ const installedPackageManagerNames = await Promise.all(
 )
 
 // Run build to have ./bin
-execaSync('yarn', 'run build'.split(' '))
+execaSync('bun', 'run build'.split(' '))
 execaSync('chmod', ['+x', './bin'])
 
 describe('dependenciesHook', async () => {
