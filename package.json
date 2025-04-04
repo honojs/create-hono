@@ -27,6 +27,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
+    "@bluwy/giget-core": "^0.1.2",
     "@hono/eslint-config": "^1.0.2",
     "@inquirer/confirm": "^5.1.8",
     "@inquirer/input": "^4.1.8",
@@ -37,7 +38,6 @@
     "esbuild": "^0.25.1",
     "eslint": "^9.23.0",
     "execa": "^8.0.1",
-    "giget": "1.2.3",
     "nanospinner": "^1.2.2",
     "np": "^10.2.0",
     "prettier": "^3.5.3",
