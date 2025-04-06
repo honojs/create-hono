@@ -8,6 +8,7 @@ const b = () =>
       js: '#!/usr/bin/env node',
     },
     platform: 'node',
+    target: 'es2022', // compatible with Node 18
     outfile: 'bin',
     format: 'esm',
     // For debug
