@@ -3,7 +3,7 @@
   "version": "0.16.0",
   "type": "module",
   "scripts": {
-    "build": "tsx ./build.ts",
+    "build": "bun ./build.ts",
     "bin": "./bin",
     "test": "vitest --run",
     "prepack": "bun run build",
@@ -42,7 +42,6 @@
     "nanospinner": "^1.2.2",
     "np": "^10.2.0",
     "prettier": "^3.5.3",
-    "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vitest": "^3.0.9"
   }
