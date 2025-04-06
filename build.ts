@@ -5,7 +5,7 @@ const b = () =>
     bundle: true,
     entryPoints: ['./src/index.ts'],
     banner: {
-      js: '#!/usr/bin/env node --input-type=module',
+      js: '#!/usr/bin/env node',
     },
     platform: 'node',
     outfile: 'bin',
