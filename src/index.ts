@@ -2,10 +2,10 @@ import { downloadTemplate } from '@bluwy/giget-core'
 import confirm from '@inquirer/confirm'
 import input from '@inquirer/input'
 import select from '@inquirer/select'
-import chalk from 'chalk'
 import { Option, program } from 'commander'
 import type { Command } from 'commander'
 import { createSpinner } from 'nanospinner'
+import * as picocolor from 'picocolors'
 import EventEmitter from 'node:events'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -89,7 +89,7 @@ async function main(
   options: ArgOptions,
   command: Command,
 ) {
-  console.log(chalk.gray(`${command.name()} version ${command.version()}`))
+  console.log(picocolor.gray(`${command.name()} version ${command.version()}`))
 
   const { install, pm, offline, template: templateArg } = options
 
@@ -97,7 +97,7 @@ async function main(
   if (targetDir) {
     target = targetDir
     console.log(
-      `${chalk.bold(`${chalk.green('✔')} Using target directory`)} … ${target}`,
+      `${picocolor.bold(`${picocolor.green('✔')} Using target directory`)} … ${target}`,
     )
   } else {
     const answer = await input({
@@ -210,8 +210,11 @@ async function main(
   }
 
   emitter.on('completed', () => {
-    console.log(chalk.green(`🎉 ${chalk.bold('Copied project files')}`))
-    console.log(chalk.gray('Get started with:'), chalk.bold(`cd ${target}`))
+    console.log(picocolor.green(`🎉 ${picocolor.bold('Copied project files')}`))
+    console.log(
+      picocolor.gray('Get started with:'),
+      picocolor.bold(`cd ${target}`),
+    )
     // eslint-disable-next-line n/no-process-exit
     process.exit(0)
   })
