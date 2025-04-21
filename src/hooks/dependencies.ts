@@ -1,8 +1,8 @@
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
-import chalk from 'chalk'
 import { execa } from 'execa'
 import { createSpinner } from 'nanospinner'
+import * as picocolor from 'picocolors'
 import { exec } from 'node:child_process'
 import type { EventEmitter } from 'node:events'
 import { chdir, exit } from 'node:process'
@@ -118,7 +118,7 @@ const registerInstallationHook = (
         spinner.success()
       } else {
         spinner.stop({
-          mark: chalk.red('×'),
+          mark: picocolor.red('×'),
           text: 'Failed to install project dependencies',
         })
         exit(procExit)
