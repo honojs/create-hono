@@ -1,8 +1,9 @@
 {
   "name": "create-hono",
   "version": "0.18.0",
+  "type": "module",
   "scripts": {
-    "build": "bun ./build.ts",
+    "build": "bun build ./src/index.ts --outfile=./bin --target=node --format=esm --banner='#!/usr/bin/env node'",
     "bin": "./bin",
     "test": "vitest --run",
     "prepack": "bun run build",
@@ -34,7 +35,6 @@
     "@inquirer/select": "^4.1.0",
     "@types/node": "^22.13.11",
     "commander": "^13.1.0",
-    "esbuild": "^0.25.1",
     "eslint": "^9.23.0",
     "execa": "^8.0.1",
     "nanospinner": "^1.2.2",
