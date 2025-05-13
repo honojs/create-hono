@@ -1,11 +1,10 @@
 import confirm from '@inquirer/confirm'
 import select from '@inquirer/select'
-import { execa } from 'execa'
+import spawn, { SubprocessError } from 'nano-spawn'
 import { createSpinner } from 'nanospinner'
 import * as picocolor from 'picocolors'
-import { exec } from 'node:child_process'
 import type { EventEmitter } from 'node:events'
-import { chdir, exit } from 'node:process'
+import { exit } from 'node:process'
 import { projectDependenciesHook } from '../hook'
 
 type PackageManager = 'npm' | 'bun' | 'deno' | 'pnpm' | 'yarn'
@@ -57,7 +56,7 @@ const registerInstallationHook = (
     if (installedPackageManagerNames.includes('deno')) {
       let isVersion1 = false
       try {
-        const { stdout } = await execa('deno', ['-v'])
+        const { stdout } = await spawn('deno', ['-v'])
         isVersion1 = stdout.split(' ')[1].split('.')[0] === '1'
       } catch {
         isVersion1 = true
@@ -101,28 +100,30 @@ const registerInstallationHook = (
     emitter.emit('packageManager', packageManager)
 
     emitter.on('dependencies', async () => {
-      chdir(directoryPath)
-
       if (!knownPackageManagers[packageManager]) {
         exit(1)
       }
 
       const spinner = createSpinner('Installing project dependencies').start()
-      const proc = exec(knownPackageManagers[packageManager])
 
-      const procExit: number = await new Promise((res) => {
-        proc.on('exit', (code) => res(code == null ? 0xff : code))
-      })
+      const [command, ...args] = knownPackageManagers[packageManager].split(' ')
 
-      if (procExit === 0) {
-        spinner.success()
-      } else {
-        spinner.stop({
-          mark: picocolor.red('×'),
-          text: 'Failed to install project dependencies',
+      try {
+        await spawn(command, args, {
+          cwd: directoryPath,
         })
-        exit(procExit)
+      } catch (error: unknown) {
+        if (error instanceof SubprocessError) {
+          spinner.stop({
+            mark: picocolor.red('×'),
+            text: 'Failed to install project dependencies',
+          })
+          exit(error.exitCode ?? 1)
+        }
+        throw error
       }
+
+      spinner.success()
 
       emitter.emit('completed')
     })
@@ -152,7 +153,7 @@ function getCurrentPackageManager(): PackageManager {
 
 function checkPackageManagerInstalled(packageManager: string) {
   return new Promise<boolean>((resolve) => {
-    execa(packageManager, ['--version'])
+    spawn(packageManager, ['--version'])
       .then(() => resolve(true))
       .catch(() => resolve(false))
   })
