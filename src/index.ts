@@ -211,10 +211,12 @@ async function main(
 
   emitter.on('completed', () => {
     console.log(picocolor.green(`🎉 ${picocolor.bold('Copied project files')}`))
-    console.log(
-      picocolor.gray('Get started with:'),
-      picocolor.bold(`cd ${target}`),
-    )
+    if (target !== ".") {
+      console.log(
+        picocolor.gray('Get started with:'),
+        picocolor.bold(`cd ${target}`),
+      )
+    }
     // eslint-disable-next-line n/no-process-exit
     process.exit(0)
   })
