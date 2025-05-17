@@ -211,7 +211,10 @@ async function main(
 
   emitter.on('completed', () => {
     console.log(picocolor.green(`🎉 ${picocolor.bold('Copied project files')}`))
-    if (target !== '.') {
+    const resolvedTarget = path.resolve(target);
+    const currentDir = process.cwd();
+    
+    if (resolvedTarget !== currentDir) {
       console.log(
         picocolor.gray('Get started with:'),
         picocolor.bold(`cd ${target}`),
