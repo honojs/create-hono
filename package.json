@@ -37,6 +37,7 @@
     "commander": "^13.1.0",
     "eslint": "^9.23.0",
     "execa": "^8.0.1",
+    "nano-spawn": "^1.0.1",
     "nanospinner": "^1.2.2",
     "np": "^10.2.0",
     "picocolors": "^1.1.1",
