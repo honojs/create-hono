@@ -4,7 +4,7 @@ Create a Hono application from starter templates.
 
 ## Quick Start
 
-Starter templates are available for each platform. Use one the following "create-hono" commands.
+Starter templates are available for each platform. Use one of the following "create-hono" commands.
 
 ```bash
 # npm
@@ -20,7 +20,7 @@ pnpm create hono@latest
 bun create hono@latest
 
 # deno
-deno run -A npm:create-hono@latest
+deno init --npm hono
 ```
 
 ## Options
@@ -30,7 +30,7 @@ deno run -A npm:create-hono@latest
 You can specify the desired template from the command line. This is useful for automation, where you'd like to skip any interactive prompts.
 
 ```
-npm create hono@latest ./my-app -- --template cloudflare-pages
+npm create hono@latest ./my-app -- --template cloudflare-workers
 ```
 
 ### `-i, --install`
