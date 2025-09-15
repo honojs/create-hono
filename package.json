@@ -23,7 +23,7 @@
     "type": "git",
     "url": "https://github.com/honojs/create-hono.git"
   },
-  "homepage": "https://honojs.dev",
+  "homepage": "https://hono.dev",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
