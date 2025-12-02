@@ -1,6 +1,6 @@
 {
   "name": "create-hono",
-  "version": "0.19.3",
+  "version": "0.19.4",
   "type": "module",
   "scripts": {
     "build": "bun build ./src/index.ts --outfile=./bin --target=node --format=esm --banner='#!/usr/bin/env node'",
