@@ -56,7 +56,7 @@ const registerInstallationHook = (
     if (installedPackageManagerNames.includes('deno')) {
       let isVersion1 = false
       try {
-        const { stdout } = await spawn('deno', ['-v'])
+        const { stdout } = await spawn('deno', ['-v'], { timeout: 3000 })
         isVersion1 = stdout.split(' ')[1].split('.')[0] === '1'
       } catch {
         isVersion1 = true
@@ -153,7 +153,7 @@ function getCurrentPackageManager(): PackageManager {
 
 function checkPackageManagerInstalled(packageManager: string) {
   return new Promise<boolean>((resolve) => {
-    spawn(packageManager, ['--version'])
+    spawn(packageManager, ['--version'], { timeout: 3000 })
       .then(() => resolve(true))
       .catch(() => resolve(false))
   })
