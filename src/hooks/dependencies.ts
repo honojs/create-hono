@@ -84,7 +84,7 @@ const registerInstallationHook = (
 
     let packageManager: string
 
-    if (pmArg && installedPackageManagerNames.includes(pmArg)) {
+    if (pmArg) {
       packageManager = pmArg
     } else {
       packageManager = await select({
@@ -111,6 +111,10 @@ const registerInstallationHook = (
       try {
         await spawn(command, args, {
           cwd: directoryPath,
+          // On Windows, stderr from cmd.exe is encoded in the OEM code page (e.g. CP932),
+          // which causes garbled text when Node.js reads it as UTF-8.
+          // Using 'inherit' pipes stderr directly to the terminal to avoid this.
+          stderr: 'inherit',
         })
       } catch (error: unknown) {
         if (error instanceof SubprocessError) {
