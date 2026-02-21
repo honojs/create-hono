@@ -68,4 +68,3 @@ and Hono contributors
 MIT
 
 This project source code is based on **Create Solid** MIT Licensed.
-<https://github.com/solidjs/solid-start/tree/main/packages/create-solid>
