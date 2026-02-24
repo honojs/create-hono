@@ -16,7 +16,7 @@ import {
   knownPackageManagerNames,
   registerInstallationHook,
 } from './hooks/dependencies'
-import type { EventMap } from './hooks/dependencies'
+import type { EventMap, PackageManager } from './hooks/dependencies'
 
 const [major, minor] = version.split('.')
 const ref = `v${major}.${minor}`
@@ -78,7 +78,7 @@ program
   .action(main)
 
 type ArgOptions = {
-  pm?: string
+  pm?: PackageManager
   offline: boolean
   install?: boolean
   template?: string
@@ -156,7 +156,7 @@ async function main(
   // Default package manager
   let packageManager = pm ?? 'npm'
   emitter.addListener('packageManager', (pm) => {
-    packageManager = String(pm)
+    packageManager = pm
   })
 
   registerInstallationHook(templateName, install, pm, emitter)

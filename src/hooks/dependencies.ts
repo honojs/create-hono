@@ -7,9 +7,16 @@ import type { EventEmitter } from 'node:events'
 import { exit } from 'node:process'
 import { projectDependenciesHook } from '../hook'
 
-type PackageManager = 'npm' | 'bun' | 'deno' | 'pnpm' | 'yarn'
+export const knownPackageManagerNames = [
+  'npm',
+  'bun',
+  'deno',
+  'pnpm',
+  'yarn',
+] as const
+export type PackageManager = (typeof knownPackageManagerNames)[number]
 
-const knownPackageManagers: { [key: string]: string } = {
+const knownPackageManagers: Record<PackageManager, string> = {
   npm: 'npm install',
   bun: 'bun install',
   deno: 'deno install',
@@ -17,7 +24,6 @@ const knownPackageManagers: { [key: string]: string } = {
   yarn: 'yarn',
 }
 
-export const knownPackageManagerNames = Object.keys(knownPackageManagers)
 const currentPackageManager = getCurrentPackageManager()
 
 // Deno and Netlify need no dependency installation step
@@ -25,14 +31,14 @@ const excludeTemplate = ['deno', 'netlify']
 
 export type EventMap = {
   dependencies: unknown[]
-  packageManager: unknown[]
+  packageManager: [PackageManager]
   completed: unknown[]
 }
 
 const registerInstallationHook = (
   template: string,
   installArg: boolean | undefined,
-  pmArg: string | undefined,
+  pmArg: PackageManager | undefined,
   emitter: EventEmitter<EventMap>,
 ) => {
   if (excludeTemplate.includes(template)) {
@@ -82,14 +88,14 @@ const registerInstallationHook = (
       return
     }
 
-    let packageManager: string
+    let packageManager: PackageManager
 
-    if (pmArg && installedPackageManagerNames.includes(pmArg)) {
+    if (pmArg) {
       packageManager = pmArg
     } else {
       packageManager = await select({
         message: 'Which package manager do you want to use?',
-        choices: installedPackageManagerNames.map((template: string) => ({
+        choices: installedPackageManagerNames.map((template) => ({
           title: template,
           value: template,
         })),
@@ -111,6 +117,10 @@ const registerInstallationHook = (
       try {
         await spawn(command, args, {
           cwd: directoryPath,
+          // On Windows, stderr from cmd.exe is encoded in the OEM code page (e.g. CP932),
+          // which causes garbled text when Node.js reads it as UTF-8.
+          // Using 'inherit' pipes stderr directly to the terminal to avoid this.
+          stderr: 'inherit',
         })
       } catch (error: unknown) {
         if (error instanceof SubprocessError) {
