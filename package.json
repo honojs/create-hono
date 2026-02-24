@@ -11,7 +11,8 @@
     "lint": "eslint --ext js,ts src",
     "lint:fix": "eslint --ext js,ts src --fix",
     "format": "prettier src --check",
-    "format:fix": "prettier src --write"
+    "format:fix": "prettier src --write",
+    "typecheck": "tsgo --noEmit"
   },
   "bin": "./bin",
   "files": [
@@ -34,6 +35,7 @@
     "@inquirer/input": "4.1.8",
     "@inquirer/select": "4.1.0",
     "@types/node": "22.13.11",
+    "@typescript/native-preview": "7.0.0-dev.20260220.1",
     "commander": "13.1.0",
     "eslint": "9.23.0",
     "execa": "8.0.1",
@@ -42,7 +44,6 @@
     "np": "10.2.0",
     "picocolors": "1.1.1",
     "prettier": "3.5.3",
-    "typescript": "5.8.2",
     "vitest": "3.0.9"
   }
 }
