@@ -118,6 +118,10 @@ const registerInstallationHook = (
             mark: picocolor.red('×'),
             text: 'Failed to install project dependencies',
           })
+          const details = capturedSpawnOutput(error)
+          if (details) {
+            console.error(details)
+          }
           exit(error.exitCode ?? 1)
         }
         throw error
@@ -157,6 +161,14 @@ function checkPackageManagerInstalled(packageManager: string) {
       .then(() => resolve(true))
       .catch(() => resolve(false))
   })
+}
+
+/**
+ * stdout/stderr captured by nano-spawn when a package manager install fails.
+ * Empty when the subprocess produced no output (or stdio was not piped).
+ */
+export function capturedSpawnOutput(error: { output?: string }): string {
+  return typeof error.output === 'string' ? error.output.trim() : ''
 }
 
 export { registerInstallationHook, checkPackageManagerInstalled }
