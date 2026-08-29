@@ -33,6 +33,7 @@ const config = {
 const templates = [
   'aws-lambda',
   'bun',
+  'cloudbase',
   'cloudflare-workers',
   'cloudflare-workers+vite',
   'deno',
