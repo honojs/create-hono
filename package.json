@@ -7,7 +7,7 @@
     "bin": "./bin",
     "test": "vitest --run",
     "prepack": "bun run build",
-    "release": "np",
+    "release": "np --no-publish",
     "lint": "eslint --ext js,ts src",
     "lint:fix": "eslint --ext js,ts src --fix",
     "format": "prettier src --check",
