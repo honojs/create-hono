@@ -118,6 +118,9 @@ const registerInstallationHook = (
             mark: picocolor.red('×'),
             text: 'Failed to install project dependencies',
           })
+          if (error.output) {
+            console.error(error.output)
+          }
           exit(error.exitCode ?? 1)
         }
         throw error
