@@ -1,0 +1,19 @@
+src/hooks/dependencies.ts
+  s_f864f132c4e7ae::t_19aec7d9b673eb 121-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "038dd3ab0a8168d4b9c738bdf7076df60ebbc1c9",
+  "prompts": {},
+  "sessions": {
+    "s_f864f132c4e7ae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c6371f3-3206-4d93-8394-e209e03a1ca3",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Yusuke Wada <yusuke@kamawada.com>"
+    }
+  }
+}
