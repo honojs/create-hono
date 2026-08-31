@@ -7,7 +7,7 @@ import type { EventEmitter } from 'node:events'
 import { exit } from 'node:process'
 import { projectDependenciesHook } from '../hook'
 
-type PackageManager = 'npm' | 'bun' | 'deno' | 'pnpm' | 'yarn'
+type PackageManager = 'npm' | 'bun' | 'deno' | 'pnpm' | 'yarn' | 'nub'
 
 const knownPackageManagers: { [key: string]: string } = {
   npm: 'npm install',
@@ -15,6 +15,7 @@ const knownPackageManagers: { [key: string]: string } = {
   deno: 'deno install',
   pnpm: 'pnpm install',
   yarn: 'yarn',
+  nub: 'nub install',
 }
 
 export const knownPackageManagerNames = Object.keys(knownPackageManagers)
@@ -149,6 +150,9 @@ function getCurrentPackageManager(): PackageManager {
   }
   if (agent.startsWith('yarn')) {
     return 'yarn'
+  }
+  if (agent.startsWith('nub')) {
+    return 'nub'
   }
 
   return 'npm'
