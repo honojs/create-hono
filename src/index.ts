@@ -42,7 +42,6 @@ const templates = [
   'nextjs',
   'nodejs',
   'vercel',
-  'cloudflare-pages',
   'x-basic',
 ]
 
