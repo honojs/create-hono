@@ -4,12 +4,18 @@ import { afterCreateHook } from '../hook'
 
 const PROJECT_NAME = new RegExp(/%%PROJECT_NAME.*%%/g)
 
-const WRANGLER_FILES = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc']
+// wrangler.* for templates that use wrangler, cloudflare.config.ts for the cf CLI
+const CONFIG_FILES = [
+  'wrangler.toml',
+  'wrangler.json',
+  'wrangler.jsonc',
+  'cloudflare.config.ts',
+]
 
 afterCreateHook.addHook(
-  ['cloudflare-workers', 'cloudflare-workers+vite', 'x-basic'],
+  ['cloudflare-workers', 'x-basic'],
   ({ projectName, directoryPath }) => {
-    for (const filename of WRANGLER_FILES) {
+    for (const filename of CONFIG_FILES) {
       try {
         const wranglerPath = path.join(directoryPath, filename)
         const wrangler = readFileSync(wranglerPath, 'utf-8')
@@ -34,10 +40,12 @@ afterCreateHook.addHook(['x-basic'], ({ packageManager, directoryPath }) => {
 
 const COMPATIBILITY_DATE_TOML = /compatibility_date\s*=\s*"\d{4}-\d{2}-\d{2}"/
 const COMPATIBILITY_DATE_JSON = /"compatibility_date"\s*:\s*"\d{4}-\d{2}-\d{2}"/
+const COMPATIBILITY_DATE_TS =
+  /compatibilityDate\s*:\s*['"]\d{4}-\d{2}-\d{2}['"]/
 afterCreateHook.addHook(
   ['cloudflare-workers', 'x-basic'],
   ({ directoryPath }) => {
-    for (const filename of WRANGLER_FILES) {
+    for (const filename of CONFIG_FILES) {
       try {
         const wranglerPath = path.join(directoryPath, filename)
         const wrangler = readFileSync(wranglerPath, 'utf-8')
@@ -52,6 +60,7 @@ afterCreateHook.addHook(
             COMPATIBILITY_DATE_JSON,
             `"compatibility_date": "${currentDate}"`,
           )
+          .replace(COMPATIBILITY_DATE_TS, `compatibilityDate: '${currentDate}'`)
         writeFileSync(wranglerPath, rewritten)
       } catch {}
     }
