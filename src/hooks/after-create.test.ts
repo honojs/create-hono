@@ -21,6 +21,13 @@ name = "%%PROJECT_NAME%%-staging"`.trim(),
   "staging": {
   "name": "%%PROJECT_NAME%%-staging"
 }`.trim(),
+          [join(directoryPath, 'cloudflare.config.ts')]: `
+export default defineConfig({
+  worker: {
+    name: '%%PROJECT_NAME%%',
+    compatibilityDate: '2023-12-01',
+  },
+})`.trim(),
         }
 
         return {
@@ -68,7 +75,7 @@ name = "%%PROJECT_NAME%%-staging"
         expect(readFileSync).toHaveBeenCalledWith(wranglerPath, 'utf-8')
 
         expect(writeFileSync).nthCalledWith(1, wranglerPath, firstHookContent)
-        expect(writeFileSync).nthCalledWith(3, wranglerPath, secondHookContent)
+        expect(writeFileSync).nthCalledWith(4, wranglerPath, secondHookContent)
       })
 
       it('rewrites the wrangler.json file with the project name', async () => {
@@ -99,7 +106,37 @@ name = "%%PROJECT_NAME%%-staging"
         })
         expect(readFileSync).toHaveBeenCalledWith(wranglerPath, 'utf-8')
         expect(writeFileSync).nthCalledWith(2, wranglerPath, firstHookContent)
-        expect(writeFileSync).nthCalledWith(4, wranglerPath, secondHookContent)
+        expect(writeFileSync).nthCalledWith(5, wranglerPath, secondHookContent)
+      })
+
+      it('rewrites the cloudflare.config.ts file with the project name', async () => {
+        const firstHookContent = `
+export default defineConfig({
+  worker: {
+    name: 'test-projectname-123',
+    compatibilityDate: '2023-12-01',
+  },
+})`.trim()
+
+        const currentDate = new Date().toISOString().split('T')[0]
+        const secondHookContent = `
+export default defineConfig({
+  worker: {
+    name: '%%PROJECT_NAME%%',
+    compatibilityDate: '${currentDate}',
+  },
+})`.trim()
+
+        const configPath = join(directoryPath, 'cloudflare.config.ts')
+
+        afterCreateHook.applyHook('cloudflare-workers', {
+          projectName,
+          directoryPath,
+          packageManager,
+        })
+        expect(readFileSync).toHaveBeenCalledWith(configPath, 'utf-8')
+        expect(writeFileSync).nthCalledWith(3, configPath, firstHookContent)
+        expect(writeFileSync).nthCalledWith(6, configPath, secondHookContent)
       })
     })
   })

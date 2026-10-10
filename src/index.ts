@@ -34,7 +34,6 @@ const templates = [
   'aws-lambda',
   'bun',
   'cloudflare-workers',
-  'cloudflare-workers+vite',
   'deno',
   'fastly',
   'lambda-edge',
