@@ -2,7 +2,9 @@ import { execa, execaSync } from 'execa'
 import type { ExecaChildProcess } from 'execa'
 import { afterAll, describe, expect, it } from 'vitest'
 import { Buffer } from 'node:buffer'
-import { existsSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { cwd } from 'node:process'
 import { checkPackageManagerInstalled } from './dependencies'
 
@@ -12,7 +14,9 @@ const packageManagersCommands: { [key: string]: string[] } = {
   npm: 'npm run bin'.split(' '),
   bun: 'bun bin'.split(' '),
   pnpm: 'pnpm run bin'.split(' '),
-  yarn: 'yarn run bin'.split(' '),
+  // Yarn 2+ refuses `yarn run` here, as this repository has no yarn.lock.
+  // npm_config_user_agent tells the bin the package manager anyway.
+  yarn: [join(cwd(), 'bin')],
 }
 
 const knownPackageManagerNames: string[] = Object.keys(packageManagersCommands)
@@ -44,20 +48,28 @@ describe('dependenciesHook', async () => {
     '$pm',
     { timeout: 60_000 },
     ({ pm }) => {
+      // Yarn 2+ would install the app as a part of this repository, so
+      // yarn creates it outside
+      const root =
+        pm === 'yarn' ? mkdtempSync(join(tmpdir(), 'create-hono-')) : cwd()
       const proc = execa(
         packageManagersCommands[pm][0],
         packageManagersCommands[pm].slice(1),
         {
-          cwd: cwd(),
+          cwd: root,
           stdin: 'pipe',
           stdout: 'pipe',
           env: { ...process.env, npm_config_user_agent: pm },
         },
       )
       const targetDirectory = `test-dir/${generateRandomAlphanumericString(8)}`
+      const targetPath = join(root, targetDirectory)
 
       afterAll(() => {
-        rmSync(targetDirectory, { recursive: true, force: true })
+        rmSync(pm === 'yarn' ? root : targetPath, {
+          recursive: true,
+          force: true,
+        })
       })
 
       it('should ask for a target directory', async () => {
@@ -108,19 +120,20 @@ describe('dependenciesHook', async () => {
       })
 
       it('should have installed dependencies', async () => {
-        while (!existsSync(`${targetDirectory}/node_modules`)) {
+        // Yarn 2+ uses Plug'n'Play by default, with no node_modules
+        const installed = () =>
+          existsSync(`${targetPath}/node_modules`) ||
+          existsSync(`${targetPath}/.pnp.cjs`)
+        while (!installed()) {
           await timeout(5_000)
-        } // 3 seconds;
+        }
 
-        expect(
-          existsSync(`${targetDirectory}/node_modules`),
-          'node_modules directory exists',
-        )
+        expect(installed(), 'dependencies are installed')
       })
 
       it(`should have package manager specific lock file (${packageManagersLockfiles[pm]})`, async () => {
         expect(
-          existsSync(`${targetDirectory}/${packageManagersLockfiles[pm]}`),
+          existsSync(`${targetPath}/${packageManagersLockfiles[pm]}`),
           'lockfile exists',
         )
 
