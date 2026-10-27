@@ -111,6 +111,9 @@ const registerInstallationHook = (
       try {
         await spawn(command, args, {
           cwd: directoryPath,
+          // A new project has no lockfile yet. Yarn 2+ refuses to create one
+          // in CI, where installs are immutable by default.
+          env: { YARN_ENABLE_IMMUTABLE_INSTALLS: 'false' },
         })
       } catch (error: unknown) {
         if (error instanceof SubprocessError) {
