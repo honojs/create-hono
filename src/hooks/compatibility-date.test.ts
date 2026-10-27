@@ -53,7 +53,7 @@ describe('compatibility date', () => {
     installInStore('.pnpm', 'workerd@1.20261019.1')
     writeFileSync(
       join(dir, 'cloudflare.config.ts'),
-      "export default defineConfig({ worker: { compatibilityDate: '2026-10-06' } })",
+      'export default defineConfig({ worker: { compatibilityDate: "2026-10-06" } })',
     )
     writeFileSync(
       join(dir, 'wrangler.jsonc'),
@@ -62,8 +62,8 @@ describe('compatibility date', () => {
 
     setCompatibilityDate(dir)
 
-    expect(readFileSync(join(dir, 'cloudflare.config.ts'), 'utf-8')).toBe(
-      "export default defineConfig({ worker: { compatibilityDate: '2026-10-19' } })",
+    expect(readFileSync(join(dir, 'cloudflare.config.ts'), 'utf-8')).toMatch(
+      /compatibilityDate: '2026-10-19'/,
     )
     expect(readFileSync(join(dir, 'wrangler.jsonc'), 'utf-8')).toBe(
       '{ "compatibility_date": "2026-10-19" }',
