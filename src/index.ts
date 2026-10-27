@@ -12,6 +12,7 @@ import path from 'node:path'
 import { version } from '../package.json'
 import { projectDependenciesHook } from './hook'
 import { afterCreateHook } from './hooks/after-create'
+import { setCompatibilityDate } from './hooks/compatibility-date'
 import {
   knownPackageManagerNames,
   registerInstallationHook,
@@ -208,6 +209,8 @@ async function main(
   }
 
   emitter.on('completed', () => {
+    // Today's date can be newer than the installed workerd supports
+    setCompatibilityDate(targetDirectoryPath)
     console.log(picocolor.green(`🎉 ${picocolor.bold('Copied project files')}`))
     const resolvedTarget = path.resolve(target)
     const currentDir = process.cwd()
