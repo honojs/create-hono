@@ -1,6 +1,6 @@
 import { execa, execaSync } from 'execa'
 import type { ExecaChildProcess } from 'execa'
-import { afterAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { Buffer } from 'node:buffer'
 import { existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -24,7 +24,7 @@ const knownPackageManagerNames: string[] = Object.keys(packageManagersCommands)
 const packageManagersLockfiles: { [key: string]: string } = {
   npm: 'package-lock.json',
   bun: 'bun.lock',
-  pnpm: 'pnpm-lock.yml',
+  pnpm: 'pnpm-lock.yaml',
   yarn: 'yarn.lock',
 }
 
@@ -65,7 +65,14 @@ describe('dependenciesHook', async () => {
       const targetDirectory = `test-dir/${generateRandomAlphanumericString(8)}`
       const targetPath = join(root, targetDirectory)
 
-      afterAll(() => {
+      beforeAll(() => {
+        cmdBuffer = ''
+      })
+
+      afterAll(async () => {
+        // A test failed before the end. Stop the install before removing
+        proc.kill()
+        await proc.catch(() => {})
         rmSync(pm === 'yarn' ? root : targetPath, {
           recursive: true,
           force: true,
@@ -80,10 +87,10 @@ describe('dependenciesHook', async () => {
           },
         ])
 
-        expect(out)
+        expect(out).toContain('Target directory')
       })
 
-      it('should clone a template to the directory', async () => {
+      it('should ask for a template', async () => {
         const out = await handleQuestions(proc, [
           {
             question: 'Which template do you want to use?',
@@ -91,7 +98,7 @@ describe('dependenciesHook', async () => {
           },
         ])
 
-        expect(out, 'Selected aws-lambda')
+        expect(out).toContain('aws-lambda')
       })
 
       it('should ask if you want to install dependencies', async () => {
@@ -102,7 +109,7 @@ describe('dependenciesHook', async () => {
           },
         ])
 
-        expect(out, 'Installing dependencies')
+        expect(out).toContain('Do you want to install project dependencies?')
       })
 
       it('should ask for which package manager to use', async () => {
@@ -113,31 +120,26 @@ describe('dependenciesHook', async () => {
           },
         ])
 
-        expect(
-          out.trim().includes(pm),
-          `Current package manager '${pm}' was picked`,
-        )
+        expect(out).toContain(`❯ ${pm}`)
       })
 
-      it('should have installed dependencies', async () => {
+      it('should clone the template and install dependencies', async () => {
+        // Wait for the exit, as the package manager is still writing
+        // files when node_modules appears
+        await proc
+
+        expect(existsSync(`${targetPath}/package.json`)).toBe(true)
         // Yarn 2+ uses Plug'n'Play by default, with no node_modules
-        const installed = () =>
+        expect(
           existsSync(`${targetPath}/node_modules`) ||
-          existsSync(`${targetPath}/.pnp.cjs`)
-        while (!installed()) {
-          await timeout(5_000)
-        }
-
-        expect(installed(), 'dependencies are installed')
+            existsSync(`${targetPath}/.pnp.cjs`),
+        ).toBe(true)
       })
 
-      it(`should have package manager specific lock file (${packageManagersLockfiles[pm]})`, async () => {
+      it(`should have package manager specific lock file (${packageManagersLockfiles[pm]})`, () => {
         expect(
           existsSync(`${targetPath}/${packageManagersLockfiles[pm]}`),
-          'lockfile exists',
-        )
-
-        cmdBuffer = ''
+        ).toBe(true)
       })
     },
   )
@@ -156,9 +158,6 @@ const generateRandomAlphanumericString = (length: number): string => {
   return result
 }
 
-const timeout = (milliseconds: number) =>
-  new Promise((res) => setTimeout(res, milliseconds))
-
 /**
  * Utility to mock the stdin of the cli. You must provide the correct number of
  * questions correctly typed or the process will keep waiting for input.
@@ -169,19 +168,21 @@ const handleQuestions = (
   questions: { question: string; answer: string | string[] }[],
 ) =>
   new Promise<string>((res) => {
-    process.stdout?.on('data', (data) => {
+    const onData = (data: Buffer) => {
       cmdBuffer = (cmdBuffer + data).replace(/\n/g, '')
       const index = questions.findIndex(({ question }) =>
         cmdBuffer.includes(question),
       )
 
       if (index >= 0) {
+        process.stdout?.off('data', onData)
         res(cmdBuffer)
         const { answer } = questions[index]
 
         writeResponse(process, Array.isArray(answer) ? answer : [answer])
       }
-    })
+    }
+    process.stdout?.on('data', onData)
   })
 
 const writeResponse = (
